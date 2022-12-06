@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="user-scalable=no" />
+    <title>Test</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <!-- External Libraries -->
+    <script src="d3.v7.min.js" ></script>
+    <script src="helperfuncs.js" ></script>
+    <script src="random.js" ></script>
+    <script src="script.js" ></script>
+    <div id="salt" >
+      <label for="reflkey">Ref Key:</label>
+      <input id="refkey" type="text" value="none" />
+      <label for="splkey">Splice Key:</label>
+      <input id="splkey" type="text" value="none" />
+      <input type="button" value="Update" onclick="rerender()" />
+    </div>
+  </body>
+</html>
