@@ -1,6 +1,7 @@
 var splrand; // random splice generator for a given seed
 var refrand; // random ref generator for a given seed
 
+/** Generates a seed from a key **/
 function cyrb128(str) {
     let h1 = 1779033703, h2 = 3144134277,
         h3 = 1013904242, h4 = 2773480762;
@@ -17,6 +18,8 @@ function cyrb128(str) {
     h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
     return [(h1^h2^h3^h4)>>>0, (h2^h1)>>>0, (h3^h1)>>>0, (h4^h1)>>>0];
 }
+
+/** Generates a random distribution from 4 seeds **/
 function sfc32(a, b, c, d) {
     return function() {
       a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; 

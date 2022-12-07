@@ -1,5 +1,11 @@
 
 function rerender(len=100, nsplice=7){
+    var spl_val = document.getElementById("splkey").value,
+        ref_val = document.getElementById("refkey").value;
+
+    splrand = setseed(spl_val);
+    refrand = setseed(ref_val);
+
     var tmp = generateReference(len, nsplice);
     var reference = tmp.new_ref,
         pos_donors = tmp.don,
@@ -13,13 +19,7 @@ function rerender(len=100, nsplice=7){
 }
 
 window.onload = function(){
-    var spl_val = document.getElementById("splkey").value,
-        ref_val = document.getElementById("refkey").value;
-
-    splrand = setseed(spl_val);
-    refrand = setseed(ref_val);
-
-    
+   
     svg = d3.select("#salt").append("svg")
         .attr("width", 1000)
         .attr("height", 667);
