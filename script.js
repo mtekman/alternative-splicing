@@ -1,6 +1,6 @@
 
-function rerender(){
-    var tmp = generateReference(100, 7);
+function rerender(len=100, nsplice=7){
+    var tmp = generateReference(len, nsplice);
     var reference = tmp.new_ref,
         pos_donors = tmp.don,
         pos_accpts = tmp.acc;

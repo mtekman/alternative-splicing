@@ -24,8 +24,6 @@ function renderExons(exons){
     let texts = exn_grp.selectAll("text[class='sequences']")
     let labels = exn_grp.selectAll("text[class='labels']")
 
-    console.log(exons)
-    
     blocks = blocks.data(exons, d => d.name)
         .join(
             enter => enter.append("rect")
@@ -90,32 +88,34 @@ function renderPairings(pairings){
     let blocks = spl_grp.selectAll("rect")
     let texts = spl_grp.selectAll("text")
 
-    blocks = blocks.data(pairings, d => d)
+    blocks = blocks.data(pairings, (d,i) => i)
         .join(
             enter => enter.append("rect")
                 .attr("fill", "purple")
                 .attr("height", 5)
                 .attr("width", 0)
                 .attr("x", d => ppml * (d.don+2)),
-            update => update
+            update => update.transition(t)
                 .attr("x", d => ppml * (d.don+2))
                 .attr("width", d => ppml * ((d.acc - d.don) - 2)),
             exit => exit.transition(t).remove().attr("width", "0")
         ).call(blocks => blocks.transition(t)
                .attr("width", d => ppml * ((d.acc - d.don) - 2)))
 
-    texts = texts.data(pairings, d => d.name)
+    texts = texts.data(pairings, (d,i) => i)
         .join(
             enter => enter.append("text")
                 .attr("x", d => ppml * (d.don + ((d.acc - d.don)/2) - 1))
                 .attr("y", -20)
                 .style("font-family", "monospace")
                 .text(""),
-            update => update,
+            update => update.transition(t)
+                .attr("x", d => ppml * (d.don + ((d.acc - d.don)/2) - 1))
+                .text(d => d.name),
             exit => exit.remove().attr("fill", "white")
         ).call(texts => texts.transition(t)
                .attr("y", 0)
-               .text(d => d.don + "-" + d.acc))
+               .text(d => d.name))
 }
 
 function renderRefDonAcc(seq, pos_donors, pos_accpts){
@@ -132,7 +132,7 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
 
     let data_ref = [{seq:seq}]
 
-    border = border.data(data_ref, d => d)
+    border = border.data(data_ref, (d,i) => i) // should never change
         .join(
             enter => enter.append("rect")
                 .attr("fill", "white")
@@ -140,7 +140,7 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
                 .attr("width", seq.length * ppml)
                 .attr("height", 13)
                 .attr("x", -200),
-            update => update,
+            update => update.transition(t).attr("width", seq.length * ppml),
             exit => exit.transition(t).remove()
         ).call(border => border.transition(t)
                .attr("x", 0))
