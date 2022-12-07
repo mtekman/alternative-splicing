@@ -35,7 +35,7 @@ function sfc32(a, b, c, d) {
 }
 
 function setseed(seedkey){
-    if (seedkey === "none"){
+    if (seedkey === "random"){
         return(Math.random)
     } else {
         let seed = cyrb128(seedkey);
