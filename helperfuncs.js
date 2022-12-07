@@ -10,6 +10,12 @@ function getIndicesOf(searchStr, str) {
     return indices;
 }
 
+/** Split string at index **/
+function splitAtIndex(str, index) {
+    return([str.slice(0, index), str.slice(index)])
+}
+
+
 /** Return all combinations of arr1 on arr2, where an element in arr1 < arr2 **/
 function prepareCartesian(arr1 = [], arr2 = []){
     const res = [];
@@ -25,7 +31,7 @@ function prepareCartesian(arr1 = [], arr2 = []){
 };
 
 /** Generate a list of non-overlapping Donor-Acceptor splice sites **/
-function makeSplicePairings()
+function makeSplicePairings(all_possible_pairs, min_dist=5)
 {
     var select_a_few = all_possible_pairs.filter((x, i) => (100 * splrand()) > 50)
 
@@ -46,8 +52,8 @@ function makeSplicePairings()
         //   in the current list
         var overlaps=false
         for (var v=0; v < valid_few.length; v++){
-            var vsta = valid_few[v].don,
-                vend = valid_few[v].acc;
+            var vend = valid_few[v].acc + min_dist;
+            //vsta = valid_few[v].don,
 
             if (sta < vend){
                 overlaps = true
@@ -55,22 +61,32 @@ function makeSplicePairings()
             }
         }
         if (overlaps){ continue; }
-        valid_few.push({don:select_a_few[s][0], acc:select_a_few[s][1]})
+        valid_few.push({don:sta, acc:end})
     }
     return (valid_few)
 }
 
 /** Generate an acceptable number of non-overlapping Donor-Acceptor splice sites, and give
  * them unique names. **/
-function makeValidSplicePairings(min=2, max=5){
+function makeValidSplicePairings(all_possible_pairs, min=2, max=5){
     var max_loops = 1000
     var num_pairings = 0
     var spees;
     while ((--max_loops > 0) && (num_pairings < min) || (num_pairings > max)){
-        spees = makeSplicePairings()
+        spees = makeSplicePairings(all_possible_pairs)
         num_pairings = spees.length;
     }
     spees.map(x=> x.name = x.don+ "-" +x.acc)
-    console.log("Found after: ", 1001-max_loops, " loops")
+    //console.log("Found after: ", 1001-max_loops, " loops")
     return(spees)
+}
+
+/** Check if a D3 group is empty, if so add it **/
+function primeGroup(name, transformcallback){
+    var new_group = d3.select("#" + name)
+    if (new_group.empty()){
+        new_group = svg.append("g").attr("id", name)
+            .attr("transform", transformcallback)
+    }
+    return (new_group)
 }

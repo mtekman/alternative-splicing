@@ -35,8 +35,8 @@ function setseed(seedkey){
     if (seedkey === "none"){
         return(Math.random)
     } else {
-        let seed = cyrb128(seed_val);
-        var randfnc = sfc32(splseed[0], splseed[1], splseed[2], splseed[3]);
+        let seed = cyrb128(seedkey);
+        var randfnc = sfc32(seed[0], seed[1], seed[2], seed[3]);
         return(randfnc)
     }
 }
