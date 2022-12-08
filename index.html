@@ -2,45 +2,7 @@
 <html lang="en">
   <head>
     <meta name="viewport" content="user-scalable=no" />
-    <style>
-
-body {
-    background-image:
-        linear-gradient(76deg,
-            #eee 16.67%,
-            #ddd 16.67%, #fff 33.33%, #fff 33.33%,
-            #fff 50%, #eee 50%, #eee 66.67%,
-            #ddd 66.67%, #fff 83.33%, #fff 83.33%, #fff 100%);
-    background-size: 61.84px 248.01px;
-}
-
-.shadowdrop {
-    filter: drop-shadow(2px 2px 5px #444);
-}
-
-#salt {
-    display:inline-flex;
-    background: white;
-    border: 3px grey solid;
-    border-radius: 9px;
-}
-
-#salt div label{
-    font-size: 0.6em;
-}
-
-#salt div{
-    display: inline-block;
-    width: 4em;
-}
-
-#salt div input{
-    width:90%;
-    vertical-align: middle;
-}
-
-        </style>
-    <title>Test</title>
+    <title>Alternative Splicing</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
   </head>
@@ -53,25 +15,44 @@ body {
     <script src="generate.js" ></script>
     <script src="render.js" ></script>
     <script src="script.js" ></script>
-    <div id="salt" >
-      <div>
-        <label for="refkey">Reference</label>
-        <input id="refkey" type="text" value="one" />
+    <!-- HTML -->
+    <div id="wholeapp" >
+      <div id="maincircle" >
+        <ul class="nodots" >
+          <li class="smallspace" >
+            <div class="cornerspace lower" ></div>
+            <h1>Alternative Splicing</h1>
+            <h2 class="smallspace" >Interactive Exercises</h2>
+            <div class="cornerspace upper" ></div>
+          </li>
+          <li class="toplevel">
+            <div class="container" >
+              <div class="box boxfill"> </div>
+              <div class="box" >
+                <label for="refkey">Reference Key</label>
+                <input id="refkey" type="text" value="one" />
+              </div>
+              <div class="box" >
+                <label for="splkey">Splice Pair Key</label>
+                <input id="splkey" type="text" value="red4" />
+              </div>
+              <div class="box boxfill"> </div>
+              <div class="box" >
+                <input type="button" value="Random" onclick="rerender_random()" />
+                <label for="bothkeys">
+                  <input type="checkbox" id="bothkeys" checked="true" />Both?
+                </label>
+              </div>
+              <div class="box" >
+                <input type="button" value="Update" onclick="rerender()" />
+              </div>
+              <div class="box boxfill"> </div>
+            </div>
+          </li>
+        </ul>
       </div>
-      <div>
-        <label for="splkey">Splicing</label>
-        <input id="splkey" type="text" value="red4" />
-      </div>
-      <div>
-        <input type="button" value="Update" onclick="rerender()" />
-        <input type="button" value="Random" onclick="rerender_random()" />
-        <div style="inline">
-          <label for="bothkeys">
-            <input type="checkbox" id="bothkeys" checked="true" style="vertical-align:middle" />Both?
-          </label>
-        </div>
-      </div>
+      <div id="svg-div"></div>
     </div>
-    <div id="svg"></div>
+    <div id="signature" >© 2022 Mehmet Tekman</div>
   </body>
 </html>

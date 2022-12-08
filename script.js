@@ -1,8 +1,9 @@
 
-function rerender_random(mode="both"){
+function rerender_random(both=false){
     var randwords = words(2);
     document.getElementById("splkey").value = randwords[1];
-    if (mode === "both"){
+    both = both || document.getElementById("bothkeys").checked
+    if (both){
         document.getElementById("refkey").value = randwords[0];
     }
     rerender();
@@ -38,7 +39,6 @@ function determineTranscripts(pairings, exons){
     // First determine whether and where a splice site bisects an exon/intron
     // Then, for each pairing determine whether it's the same exon/intron
     // Finally deliver the modified sequence.
-    console.log(pairings, exons);
     for (var p=0; p < pairings.length; p++){
         
     }
@@ -46,9 +46,8 @@ function determineTranscripts(pairings, exons){
 
 window.onload = function(){
    
-    svg = d3.select("#svg").append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%");
+    svg = d3.select("#svg-div").append("svg")
+        .attr('viewBox', '0 0 800 300')
 
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
     rerender();

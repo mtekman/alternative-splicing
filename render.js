@@ -21,7 +21,7 @@ function renderExons(exons){
     exons.map((x,i) => x["name"]="Ex" + (i+1));
 
     let blocks = exn_grp.selectAll("rect"),
-        texts = exn_grp.selectAll("text[class='sequences']"),
+        sequences = exn_grp.selectAll("text[class='sequences']"),
         labels = exn_grp.selectAll("text[class='labels']");
 
     blocks = blocks.data(exons, d => d.name)
@@ -36,14 +36,14 @@ function renderExons(exons){
                 .attr("width", d => ppml * d.len)
                 .attr("x", d => ppml * d.beg),
             exit => exit.transition(t).remove()
-                .attr("fill", "white")
+                .attr("opacity", "0")
         ).call(blocks => blocks.transition(t)
                .attr("fill", (d,i) => d3.schemeCategory10[i])
                .attr("height", 30)
                .attr("width", d => ppml * d.len)
                .attr("x", d => ppml * d.beg));
 
-    texts = texts.data(exons, d => d.name)
+    sequences = sequences.data(exons, d => d.name)
         .join(
             enter => enter.append("text") // sequence
                 .attr("x", d => ppml * d.beg)
@@ -55,7 +55,7 @@ function renderExons(exons){
                 .attr("x", d => ppml * d.beg)
                 .text(d => d.seq),
             exit => exit.remove()
-        ).call(texts => texts.transition(t)
+        ).call(sequences => sequences.transition(t)
                .attr("y", 0));
 
     labels = labels.data(exons, d => d.name)
@@ -70,7 +70,7 @@ function renderExons(exons){
             update => update.transition(t)
                 .attr("x", d => ppml * (d.beg + ((d.end - d.beg)/2) - 2)),
             exit => exit.remove()
-        ).call(texts => texts.transition(t)
+        ).call(labels => labels.transition(t)
                .attr("y", 18));
 }
 
@@ -113,7 +113,7 @@ function renderPairings(pairings){
             update => update.transition(t)
                 .attr("x", d => ppml * (d.don + ((d.acc - d.don)/2) - 1))
                 .text(d => d.name),
-            exit => exit.remove().attr("fill", "white")
+            exit => exit.transition(t).remove().attr("opacity", "0")
         ).call(texts => texts.transition(t)
                .attr("y", 0)
                .text(d => d.name));
@@ -155,7 +155,7 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
                 .attr("x", -200)
                 .attr("y", 11),
             update => update,
-            exit => exit.transition(t).remove().attr("fill", "white")
+            exit => exit.transition(t).remove().attr("opacity", "0")
         ).call(texts => texts.transition(t)
                .attr("x", 0));
 
