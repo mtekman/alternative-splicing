@@ -8,6 +8,15 @@ const off_col = 10,
 
 var t; // transition elem
 
+/** Determine the new SVG viewport size based on the genome length **/
+function newViewportSize(genome_length){
+    var width = (off_col + genome_length) * ppml
+    if (width < 400){
+        width = 400
+    }
+    svg.attr('viewBox', `0 0 ${width} 300`)
+}
+
 
 function renderExons(exons){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
@@ -24,6 +33,8 @@ function renderExons(exons){
         sequences = exn_grp.selectAll("text[class='sequences']"),
         labels = exn_grp.selectAll("text[class='labels']");
 
+    console.log(exons)
+    
     blocks = blocks.data(exons, d => d.name)
         .join(
             enter => enter.append("rect")
@@ -128,7 +139,7 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
             y = ref_row;
         return(`translate(${x},${y})`);
     });
-   
+
     let border = ref_grp.selectAll("rect"),
         refs = ref_grp.selectAll("text[class='reference']"),
         title = ref_grp.selectAll("text[class='title']")

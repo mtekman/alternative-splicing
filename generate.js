@@ -78,8 +78,8 @@ function addSpliceSites(refseq, rough_num, min_space=4){
              don:don_pos, acc:acc_pos});
 }
 
-/** Generate a reference of desired length and desired num splice sites **/
-function generateReference(wanted_len, nsplice){
+/** Generate a Genome reference of desired length and desired num splice sites **/
+function generateGenome(wanted_len, nsplice){
     return(addSpliceSites(generateCleanRef(wanted_len), nsplice));
 }
 

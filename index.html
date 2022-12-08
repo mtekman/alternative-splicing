@@ -27,16 +27,18 @@
           </li>
           <li class="toplevel">
             <div class="container" >
-              <div class="box boxfill"> </div>
+              <div class="box" >
+                <label for="genkey">Genome Size</label>
+                <input id="genkey" type="number" min="10" max="200" step="10" value="100" />
+              </div>
               <div class="box" >
                 <label for="refkey">Reference Key</label>
                 <input id="refkey" type="text" value="one" />
               </div>
               <div class="box" >
                 <label for="splkey">Splice Pair Key</label>
-                <input id="splkey" type="text" value="red4" />
+                <input id="splkey" type="text" value="two" />
               </div>
-              <div class="box boxfill"> </div>
               <div class="box" >
                 <input type="button" value="Random" onclick="rerender_random()" />
                 <label for="bothkeys">
@@ -44,15 +46,14 @@
                 </label>
               </div>
               <div class="box" >
-                <input type="button" value="Update" onclick="rerender()" />
+                <input type="button" id="updatebutton" value="Update" onclick="rerender()" />
               </div>
-              <div class="box boxfill"> </div>
             </div>
           </li>
         </ul>
       </div>
       <div id="svg-div"></div>
     </div>
-    <div id="signature" >© 2022 Mehmet Tekman</div>
+    <div id="signature" >© 2022 <a href="https://gitlab.com/mtekman">Mehmet Tekman</a></div>
   </body>
 </html>
