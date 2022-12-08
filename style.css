@@ -53,14 +53,14 @@ body {
 
 /** Keeps subtitle aligned **/
 #maincircle h2.smallspace {
-  margin-top: -7vmin;
+  margin-top: -4em;
   background-color: black;
   color:white;
 }
 
 #maincircle h1 {
   font-family: 'Ubuntu', sans-serif;
-  font-size: 8vmin;
+  font-size: 2.5em;
   background-color:#eee;
   border: 3px solid black;
   border-radius: 19px 19px 0px 0px;
@@ -77,6 +77,7 @@ body {
     display:flex;
     max-width: 900px;
     padding: 0.1em;
+  justify-content: center;
 }
 
 .title {
@@ -96,8 +97,6 @@ body {
 
 .container {
   display: flex;
-  flex-wrap: wrap;
-  
 }
 
 .shadowdrop {
@@ -122,9 +121,27 @@ body {
   font-weight: bold;
 }
 
-.box input {
-  font-size: 2.5vmin;
+/** Always have this size for inputs **/
+.box input {font-size: 0.7em;}
+
+@media (min-width: 0px) and (max-width: 699px) {
+  .box label {font-size: 0.5em;}
+  #maincircle h1 {font-size: 1em;}
+  #maincircle h2.smallspace {margin-top: -1.5em}
 }
+
+@media (max-aspect-ratio: 5/8) {
+  .container {flex-direction: column; width: 95%;}
+}
+
+@media (min-width: 700px) and (max-width: 1000px) {
+  .box label {font-size: 1vmax;}
+}
+
+@media (min-width: 1001px) {
+  .box label {font-size: 1em;}
+}
+
 
 .box input[type="checkbox"] {
   vertical-align: middle;

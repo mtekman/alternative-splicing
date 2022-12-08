@@ -7,7 +7,7 @@ function initUpdateOnTextboxEdit(){
         updatebutton.click();
         event.preventDefault();
     }
-    
+
     var textfields = document.querySelectorAll("input[type='text']")
     textfields.forEach(x => {
         x.addEventListener("keyup", clickUpdate)
@@ -21,7 +21,7 @@ function initUpdateOnTextboxEdit(){
     });
     newViewportSize(numfield.valueAsNumber);
     rerender(numfield.valueAsNumber);
-    
+
 }
 
 function rerender_random(both=false){
@@ -41,7 +41,7 @@ function rerender(nsplice=7){
 
     if (ref_val === "random"){
         document.getElementById("splkey").value = spl_val = "random";
-    }       
+    }
 
     splrand = setseed(spl_val);
     refrand = setseed(ref_val);
@@ -55,25 +55,42 @@ function rerender(nsplice=7){
         all_possible_pairs = prepareCartesian(pos_donors, pos_accpts);
 
     var pairings = makeValidSplicePairings(all_possible_pairs);
-    var splice_verdict = determineTranscripts(pairings, exons);
-    
-    renderAll(genome, exons, pos_donors, pos_accpts, pairings);
+    var transcriptome_info = determineTranscriptome(genome, pairings);
+    console.log(transcriptome_info)
+
+    renderAll(genome, transcriptome_info, exons, pos_donors, pos_accpts, pairings);
 }
 
 /** Determine transcripts from the splice pairings and exon  sequences **/
-function determineTranscripts(pairings, exons){
+function determineTranscriptome(genome, pairings){
     // First determine whether and where a splice site bisects an exon/intron
     // Then, for each pairing determine whether it's the same exon/intron
     // Finally deliver the modified sequence.
+    var transcriptome=[],
+        last_cut_index = 0
     for (var p=0; p < pairings.length; p++){
         // Slice the genome
-        
+        transcriptome.push(genome.substring(last_cut_index, pairings[p].don))
+        last_cut_index = pairings[p].acc + 2
     }
+    transcriptome.push(genome.substring(last_cut_index, genome.length))
+
+    var splice_pos = [{pos:transcriptome[0].length, size:(pairings[0].acc - pairings[0].don)}],
+        cumul = splice_pos[0].pos;
+    for (var s=1; s < transcriptome.length; s++){
+        var tlen = transcriptome[s].length
+        var currlen = cumul + tlen;
+        if (tlen > 0){
+            splice_pos.push({pos:currlen, size:(pairings[s].acc - pairings[s].don)})
+        }
+        cumul = currlen
+    }
+    return({trans:transcriptome.join(""), splice:splice_pos});
 }
 
-window.onload = function(){   
+window.onload = function(){
     svg = d3.select("#svg-div").append("svg")
         .attr('viewBox', '0 0 800 300')
-    
+
     initUpdateOnTextboxEdit()
 };

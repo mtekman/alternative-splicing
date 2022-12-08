@@ -32,9 +32,7 @@ function renderExons(exons){
     let blocks = exn_grp.selectAll("rect"),
         sequences = exn_grp.selectAll("text[class='sequences']"),
         labels = exn_grp.selectAll("text[class='labels']");
-
-    console.log(exons)
-    
+  
     blocks = blocks.data(exons, d => d.name)
         .join(
             enter => enter.append("rect")
@@ -106,13 +104,13 @@ function renderPairings(pairings){
                 .attr("fill", "purple")
                 .attr("height", 5)
                 .attr("width", 0)
-                .attr("x", d => ppml * (d.don+2)),
+                .attr("x", d => ppml * (d.don)),
             update => update.transition(t)
-                .attr("x", d => ppml * (d.don+2))
-                .attr("width", d => ppml * ((d.acc - d.don) - 2)),
+                .attr("x", d => ppml * (d.don))
+                .attr("width", d => ppml * ((d.acc - d.don + 2))),
             exit => exit.transition(t).remove().attr("width", "0")
         ).call(blocks => blocks.transition(t)
-               .attr("width", d => ppml * ((d.acc - d.don) - 2)));
+               .attr("width", d => ppml * ((d.acc - d.don + 2))));
 
     texts = texts.data(pairings, (d,i) => i)
         .join(
@@ -128,6 +126,10 @@ function renderPairings(pairings){
         ).call(texts => texts.transition(t)
                .attr("y", 0)
                .text(d => d.name));
+}
+
+function renderTranscriptome(transcriptome, pos_splice){
+
 }
 
 function renderRefDonAcc(seq, pos_donors, pos_accpts){
@@ -219,8 +221,9 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
 }
 
 
-function renderAll(seq, exons, pos_donors, pos_accpts, pairings){
+function renderAll(seq, transcriptome, exons, pos_donors, pos_accpts, pairings){
     renderRefDonAcc(seq, pos_donors, pos_accpts);
     renderExons(exons);
     renderPairings(pairings);
+    //renderTranscriptome(transcriptome);
 }
