@@ -40,7 +40,7 @@ function determineTranscripts(pairings, exons){
     // Then, for each pairing determine whether it's the same exon/intron
     // Finally deliver the modified sequence.
     for (var p=0; p < pairings.length; p++){
-        
+        // Slice the genome
     }
 }
 

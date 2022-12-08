@@ -4,7 +4,7 @@ const ppml = 7.21; // pixels per monospace letter
 const off_col = 10,
       spl_row = 30,
       ref_row = 50,
-      exn_row = 80;
+      exn_row = 90;
 
 var t; // transition elem
 
@@ -128,12 +128,12 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
             y = ref_row;
         return(`translate(${x},${y})`);
     });
+   
     let border = ref_grp.selectAll("rect"),
-        texts = ref_grp.selectAll("text");
+        refs = ref_grp.selectAll("text[class='reference']"),
+        title = ref_grp.selectAll("text[class='title']")
 
-    let data_ref = [{seq:seq}];
-
-    border = border.data(data_ref, (d,i) => i) // should never change
+    border = border.data([{0:seq}], (d,i) => i) // should never change
         .join(
             enter => enter.append("rect")
                 .attr("fill", "white")
@@ -141,23 +141,39 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
                 .attr("class","shadowdrop")
                 .attr("width", seq.length * ppml)
                 .attr("height", 13)
-                .attr("x", -200),
+                .attr("y", -20),
             update => update.transition(t).attr("width", seq.length * ppml),
             exit => exit.transition(t).remove()
         ).call(border => border.transition(t)
-               .attr("x", 0));
+               .attr("y", 0));
 
-    texts = texts.data(data_ref, d => d.seq)
+    refs = refs.data([{seq:seq}], d => d.seq)
         .join(
             enter => enter.append("text")
                 .style("font-family", "monospace")
-                .text(seq)
-                .attr("x", -200)
-                .attr("y", 11),
+                .text(d => d.seq)
+                .attr("class", "reference")
+                .attr("x", 0)
+                .attr("y", 11)
+                .attr("opacity", 0),
             update => update,
-            exit => exit.transition(t).remove().attr("opacity", "0")
-        ).call(texts => texts.transition(t)
-               .attr("x", 0));
+            exit => exit.remove().attr("opacity", "0")
+        ).call(refs => refs.transition(t).attr("opacity", 1));
+
+    title = title.data([{0:"Genome"}], (d,i) => i) // Should also never change
+        .join(
+            enter => enter.append("text")
+                .style("font-family", "sans")
+                .style("font-size", "6pt")
+                .attr("class", "title")
+                .text("Genome")
+                .attr("y", 20)
+                .attr("x", -20)
+                .attr("opacity", 0),
+            update => update,
+            exit => exit.transition(t).remove()
+        ).call(title => title.transition(t).attr("opacity", 1).attr("x",0))
+
 
 
     // Highlight Donors and Acceptors
@@ -187,7 +203,7 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
                 .attr("x", d => ppml * d.val)
                 .attr("fill", d => d.fill),
             update => update.transition(t).attr("x", d => ppml * d.val),
-            exit => exit.transition(t).remove().attr("fill", "white")
+            exit => exit.transition(t).remove().attr("opacity", "0")
         ).call(dag => dag.transition(t).attr("y", -2));
 }
 
