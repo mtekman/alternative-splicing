@@ -36,15 +36,16 @@ function determineTranscriptome(genome, pairings){
 /** Determine the sequences of spliced exons, and provide a judgement **/
 function determineSplicedExons(exons, splice){
     // For each exon (beg,end), check the splice site (acc, don) overlap
-
     var spliced_exons = []
-    
+
     for (var e=0; e < exons.length; e++){
         var exon = exons[e],
             ex_beg = exon.beg, ex_end = exon.end;
 
-        var ex_pieces = []
-        
+        // we build a list of positions to slice, then slice them in reverse position
+        // order to keep the positions relevant after each operation
+        var positions_to_slice_out = [];
+
         for (var s=0; s < splice.length; s++){
             var ssite = splice[s],
                 ss_beg = ssite.don, ss_end = ssite.acc;
@@ -54,21 +55,37 @@ function determineSplicedExons(exons, splice){
             }
 
             // We deal with the x or more splice sites that can splice an Exon
-            // Scenarios:
-            // - 1) Splice end overlaps begin of exon
-            // - 2) Splice begin overlaps end of exon
-            // - 3) Splice is contained wholly within exon
-            // - 4) Splice completely overlaps exon (deletes exon)
-
-            // Scenario 4
+            // into the 4 Scenarios:
+            //
+            // 1) Splice completely overlaps exon (deletes exon)
             if ((ss_beg <= ex_beg) && (ss_end >= ex_end)){
-                spliced_exons.push("")
+                positions_to_slice_out.push([ex_beg, ex_end])
                 break;
-            } 
-            
-            
+            }
+            // 2) Splice is contained wholly within exon
+            else if ((ss_beg > ex_beg) && (ss_end < ex_end)){
+                positions_to_slice_out.push([ss_beg, ss_end + 2]) // 2 for size of ss
+            }
+            // 3) Splice begin overlaps end of exon
+            else if ((ss_beg > ex_beg) && (ss_end > ex_end)){
+                positions_to_slice_out.push([ss_beg, ex_end])
+            }
+            // 4) Splice end overlaps begin of exon
+            else if ((ss_beg < ex_beg) && (ss_end > ex_beg)){
+                positions_to_slice_out.push([ex_beg, ss_end + 2])
+            }
         }
+        // Sort the positions to slice out, and reverse
+        positions_to_slice_out.sort((x,y) => y[1] - x[1])
+        // Slice
+        var working_exon = exon.seq;
+        for (var p=0; p < positions_to_slice_out.length; p++){
+            var slice_pair = positions_to_slice_out[p]
+            working_exon = splitAtIndex(working_exon, slice_pair[0] - exon.beg)[0] +
+                "" +
+                splitAtIndex(working_exon, slice_pair[1] - exon.beg)[1]
+        }
+        spliced_exons.push(working_exon)
     }
-
-    console.log(exons, splice)
+    return(spliced_exons)
 }

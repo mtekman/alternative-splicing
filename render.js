@@ -292,11 +292,11 @@ function renderDonAcc(pos_donors, pos_accpts){
 }
 
 
-function renderAll(seq, transcriptome, exons, pos_donors, pos_accpts, pairings){
+function renderAll(seq, transcriptome, exons, pos_donors, pos_accpts, splice){
     renderGenome(seq)
     renderDonAcc(pos_donors, pos_accpts);
     renderExons(exons);
-    renderPairings(pairings);
+    renderPairings(splice);
     renderTranscriptome(transcriptome);
-    renderSplicedExons(exons, pairings)
+    //renderSplicedExons(exons, splice)
 }

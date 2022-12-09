@@ -54,10 +54,11 @@ function rerender(nsplice=7){
     var exons = generateExons(tmp.new_ref),
         all_possible_pairs = prepareCartesian(pos_donors, pos_accpts);
 
-    var pairings = makeValidSplicePairings(all_possible_pairs);
-    var transcriptome_info = determineTranscriptome(genome, pairings);
+    var splice = makeValidSplicePairings(all_possible_pairs);
+    var transcriptome = determineTranscriptome(genome, splice);
+    var exons_spliced = determineSplicedExons(exons, splice)
 
-    renderAll(genome, transcriptome_info, exons, pos_donors, pos_accpts, pairings);
+    renderAll(genome, transcriptome, exons, pos_donors, pos_accpts, splice);
 }
 
 
