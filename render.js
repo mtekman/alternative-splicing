@@ -93,53 +93,72 @@ function renderPairings(pairings){
     // Setup Splice Pairings
     var spl_grp = primeGroup("splices", {x:off_col,y:spl_row})
 
-    let blocks = spl_grp.selectAll("rect"),
+    let blocks = spl_grp.selectAll("polyline"),
         texts = spl_grp.selectAll("text");
+
+    const y_l1 = 4, y_l2 = -1, y_l3 = y_l2, y_l4 = -4;
+
+    function makeC(d,i){
+        let x_left = ppml['12px'] * (d.don + 1),
+            x_right = ppml['12px'] * (d.acc + 1),
+            x_mid = ppml['12px'] * (1 + d.don + ((d.acc - d.don)/2))
+
+        let point_arr =
+            [`${x_left},${y_l1}`, `${x_left},${y_l2}`,
+             `${x_mid - 2},${y_l3}`,
+             `${x_mid},${y_l4}`,
+             `${x_mid + 2},${y_l3}`,
+             `${x_right},${y_l2}`, `${x_right},${y_l1}`
+             //`${x_left},${y_bott}`,
+            ]
+        return(point_arr.join(" "))
+    }
 
     blocks = blocks.data(pairings, (d,i) => i)
         .join(
-            enter => enter.append("rect")
-                .attr("fill", "purple")
-                .attr("height", 5)
-                .attr("width", 0)
-                .attr("x", d => ppml['12px'] * (d.don)),
+            enter => enter.append("polyline")
+                .attr("fill", "none")
+                .attr("stroke", "purple")
+                .attr("stroke-width", 2.3)
+                .attr("points", makeC),
             update => update.transition(t)
-                .attr("x", d => ppml['12px'] * (d.don))
-                .attr("width", d => ppml['12px'] * ((d.acc - d.don + 2))),
-            exit => exit.transition(t).remove().attr("width", "0")
-        ).call(blocks => blocks.transition(t)
-               .attr("width", d => ppml['12px'] * ((d.acc - d.don + 2))));
+                .attr("points", makeC),
+            exit => exit.transition(t).remove().attr("transform", "translate(0,-40)")
+        ).call(blocks => blocks.transition(t));
 
     texts = texts.data(pairings, (d,i) => i)
         .join(
             enter => enter.append("text")
-                .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1))
+                .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1.5))
                 .attr("y", -20)
                 .style("font-family", "monospace")
                 .text(""),
             update => update.transition(t)
-                .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1))
+                .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1.5))
                 .text(d => d.name),
             exit => exit.transition(t).remove().attr("opacity", "0")
         ).call(texts => texts.transition(t)
-               .attr("y", -1)
+               .attr("y", -y_l1)
                .text(d => d.name));
 }
 
 function renderSpliceJunctions(splice, offset_x){
     var spj_group = primeGroup("spljunc", {x:offset_x, y:tra_row}, true) // bind to tra row
 
-    let poly = spj_group.selectAll("polygon");
+    let poly = spj_group.selectAll("polyline");
     let seqs = spj_group.selectAll("text");
 
     function makeY(d,i){
         let size = Math.floor(d.size / 10),
             vert = -10*((i%3)+1), // prong
-            stct = vert +5;       // prong stem
+            stct = vert + 5;      // prong stem
         let point_arr =
-            [`${ppml['12px'] * d.pos},12`            , `${ppml['12px'] * d.pos},${stct}`,
-             `${ppml['12px'] * (d.pos-size)},${vert}`, `${ppml['12px'] * d.pos},${stct}`,
-             `${ppml['12px'] * (d.pos+size)},${vert}`, `${ppml['12px'] * d.pos},${stct}`
+            [`${ppml['12px'] * d.pos},5`,
+             `${ppml['12px'] * d.pos},${stct}`,
+             `${ppml['12px'] * (d.pos-size)},${vert}`,
+             `${ppml['12px'] * d.pos},${stct}`,
+             `${ppml['12px'] * (d.pos+size)},${vert}`,
+             `${ppml['12px'] * d.pos},${stct}`
             ]
         return(point_arr.join(" "))
     }
@@ -150,10 +169,10 @@ function renderSpliceJunctions(splice, offset_x){
 
     poly = poly.data(splice, (d,i) => i)
         .join(
-            enter => enter.append("polygon")
+            enter => enter.append("polyline")
                 .attr("points", makeY)
                 .attr("stroke", "red")
-                .attr("stroke-width", 0.5)
+                .attr("stroke-width", 1)
                 .attr("transform", "translate(0,-200)")
                 .attr("opacity", 0),
             update => update.transition(t)
@@ -164,7 +183,7 @@ function renderSpliceJunctions(splice, offset_x){
                .attr("transform", "translate(0,0)")
                .attr("opacity", 1));
 
-    seqs = seqs.data(splice, d => d.seq)
+    seqs = seqs.data(splice, (d,i) => i)
         .join(
             enter => enter.append("text")
                 .text(d => d.seq)
@@ -174,7 +193,7 @@ function renderSpliceJunctions(splice, offset_x){
                 .attr("x", d => (d.pos * ppml['12px']) - (ppml['8px'] * d.size/2))
                 .attr("y", -400)
                 .attr("opacity",0),
-            update => update.text(d=>d.seq)
+            update => update.transition(t).text(d => d.seq)
                 .attr("x", d => (d.pos * ppml['12px']) - (ppml['8px'] * d.size/2))
                 .attr("y", seqPlace).attr("opacity",1),
             exit => exit.transition(t).remove()
@@ -290,7 +309,7 @@ function renderDonAcc(pos_donors_accpts){
 }
 
 function renderSplicedExons(spliced_exons){
-    
+
 }
 
 
