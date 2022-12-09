@@ -124,6 +124,15 @@ body {
 /** Always have this size for inputs **/
 .box input {font-size: 0.7em;}
 
+@media (max-width: 400px){
+  .container {
+    display: grid;
+    grid-template-rows: 2em 2em;
+    grid-template-columns: 30% 30% 30%;
+  }
+  .box {flex-direction: column;}
+}
+
 @media (min-width: 0px) and (max-width: 699px) {
   .box label {font-size: 0.5em;}
   #maincircle h1 {font-size: 1em;}
@@ -152,6 +161,7 @@ body {
   width: 90%;
   border-radius: 10px;
   border: 2px solid #555;
+  display: flex-grid;
 }
 
 .box input[type="button"] {
