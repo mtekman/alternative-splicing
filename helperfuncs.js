@@ -93,8 +93,8 @@ function primeGroup(name, trans_offsets, update_always=false){
     if (new_group.empty()){
         new_group = svg_group.append("g").attr("id", name)
             .attr("transform", transform)
-    } else {
-        new_group.attr("transform", transform())
+    } else if (update_always) {
+        new_group.transition(t).attr("transform", transform())
     }
     return (new_group)
 }

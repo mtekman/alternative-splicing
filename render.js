@@ -7,7 +7,8 @@ const off_col = 10,
       spl_row = 30,
       ref_row = 50,
       exn_row = 90,
-      tra_row = 180;
+      spj_row = 180,
+      tra_row = 200;
 
 /** Determine the new SVG viewport size based on the genome length **/
 function newViewportSize(genome_length){
@@ -29,7 +30,7 @@ function renderExons(exons){
     let blocks = exn_grp.selectAll("rect"),
         sequences = exn_grp.selectAll("text[class='sequences']"),
         labels = exn_grp.selectAll("text[class='labels']");
-  
+ 
     blocks = blocks.data(exons, d => d.name)
         .join(
             enter => enter.append("rect")
@@ -39,6 +40,8 @@ function renderExons(exons){
                 .attr("x", d => ppml * d.beg)
                 .attr("class","shadowdrop"),
             update => update.transition(t)
+                .attr("fill", (d,i) => d3.schemeCategory10[i])
+                .attr("opacity", "1")
                 .attr("width", d => ppml * d.len)
                 .attr("x", d => ppml * d.beg),
             exit => exit.transition(t).remove()
@@ -56,6 +59,7 @@ function renderExons(exons){
                 .attr("y", 0)
                 .attr("class", "sequences")
                 .style("font-family", "monospace")
+                .attr("fill", "grey")
                 .text(d => d.seq),
             update => update.transition(t)
                 .attr("x", d => ppml * d.beg)
