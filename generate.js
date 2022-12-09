@@ -30,21 +30,29 @@ function addSpliceSites(clean_ref, exons){
         don_normal = exons.map(x => x.end);
 
     var nsplice = Math.floor(clean_ref.length / 30)   // 1 spurious ss every 20bp
+    var current_positions = acc_normal.concat(don_normal)
+    current_positions.sort((x,y) => x - y)
 
-    // var splice_map = {}
-    // for (var p=0; p < acc_normal; p++){
-    //     //splice_map[
-    // }
+    // Add spurious sites
+    if (current_positions[0] > 8){
+        don_normal.push(3 + Math.floor(refrand() * (current_positions[0] - 5)))
+    }
+    for (var c=1; c < current_positions.length; c++){
+        let ss_1 = current_positions[c-1] + 2,
+            ss_2 = current_positions[c] - 2;
 
-    // // Add spurious sites
-    // for (var ad=0; ad < nsplice; ad++){
-    //     let new_site = Math.floor(1 + refrand() * (clean_ref.length - 1))
-    //     if (refrand() > 0.5){
-    //         acc_normal.push(new_site)
-    //     } else {
-    //         don_normal.push(new_site)
-    //     }
-    // }
+        let new_site = Math.floor(ss_1 + refrand() * (ss_2 - ss_1))
+        let ss_1diff = new_site - ss_1,
+            ss_2diff = ss_2 - new_site
+        
+        if ((ss_1diff > 4) && (ss_2diff > 4)){
+            if (refrand() > 0.5){
+                acc_normal.push(new_site)
+            } else {
+                don_normal.push(new_site)
+            }
+        }
+    }
     acc_normal.sort((x,y) => x - y)
     don_normal.sort((x,y) => x - y)
 
@@ -62,10 +70,7 @@ function addSpliceSites(clean_ref, exons){
     insertSplice(don_normal, don)
 
     return ({new_ref: working_seq,
-             don_acc: {
-                 don:don_normal,
-                 acc:acc_normal}
-            });
+             don_acc: {don:don_normal, acc:acc_normal}});
 }
 
 /** Generate a Genome reference of desired length and desired num splice sites **/
