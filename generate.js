@@ -83,7 +83,7 @@ function generateGenome(clean_ref, exons){
 function generatePrecursorExons(clean_ref, spacing=4, min_s=4, max_s=30){
     var exon_pos = [],
         index = 0,
-        exonspace = clean_ref.length / 2; // number of exon spaces
+        exonspace = clean_ref.length / 3; // number of exon spaces
 
     while (index < clean_ref.length){
         let max_tries = 1000,

@@ -57,8 +57,12 @@ function rerender(){
     var all_possible_pairs = prepareCartesian(splice_pos.don, splice_pos.acc);
     var splice = makeValidSplicePairings(all_possible_pairs);
 
-    var transcriptome = determineTranscriptome(genome, splice);
-    var exons_spliced = determineSplicedExons(exons, splice)
+    var transcriptome = null,
+        exons_spliced = null;
+    if (splice.length > 0){
+        transcriptome = determineTranscriptome(genome, splice);
+        exons_spliced = determineSplicedExons(exons, splice)
+    }
 
 
     renderAll(genome, transcriptome, exons, splice_pos, splice, exons_spliced);
@@ -68,9 +72,13 @@ function rerender(){
 
 window.onload = function(){
     svg = d3.select("#svg-div").append("svg")
-        .attr('viewBox', '0 0 800 300')
     // all groups are contained within a single parent group
     svg_group = svg.append("g")
 
+    const zoom = d3.zoom().on('zoom', e => {
+        svg_group.attr("transform", (transform = e.transform));
+    });
+    svg.call(zoom);
+    
     initUpdateOnTextboxEdit()
 };

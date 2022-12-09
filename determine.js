@@ -18,6 +18,10 @@ function determineTranscriptome(genome, pairings){
         return({pos:pos, seq:seq,size:size})
     }
 
+    if (pairings.length < 1){
+        return({seq:genome, splice:[{pos:0, seq:0}]});
+    } 
+    
     var splice_pos = [getSizeandSequence(transcriptome[0].length, pairings[0])],
         cumul = splice_pos[0].pos;
     for (var s=1; s < transcriptome.length; s++){
@@ -25,7 +29,7 @@ function determineTranscriptome(genome, pairings){
         var spl = pairings[s]
         var currlen = cumul + tlen;
         if (tlen > 0 && spl !== undefined){
-            splice_pos.push(getSizeandSequence(currlen, pairings[s]))
+                splice_pos.push(getSizeandSequence(currlen, pairings[s]))
         }
         cumul = currlen
     }

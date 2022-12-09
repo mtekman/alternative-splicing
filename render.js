@@ -99,8 +99,8 @@ function renderPairings(pairings){
     const y_l1 = 4, y_l2 = -1, y_l3 = y_l2, y_l4 = -4;
 
     function makeC(d,i){
-        let x_left = ppml['12px'] * (d.don + 1),
-            x_right = ppml['12px'] * (d.acc + 1),
+        let x_left = ppml['12px'] * (d.don + 0.3),
+            x_right = ppml['12px'] * (d.acc + 1.7),
             x_mid = ppml['12px'] * (1 + d.don + ((d.acc - d.don)/2))
 
         let point_arr =
@@ -147,18 +147,21 @@ function renderSpliceJunctions(splice, offset_x){
 
     let poly = spj_group.selectAll("polyline");
     let seqs = spj_group.selectAll("text");
-
+    
     function makeY(d,i){
         let size = Math.floor(d.size / 10),
-            vert = -10*((i%3)+1), // prong
-            stct = vert + 5;      // prong stem
+            x_left = ppml['12px'] * d.pos,
+            x_right = ppml['12px'] * (d.pos+size),
+            y_vert = -10*((i%3)+1), // prong
+            y_stct = y_vert + 5;      // prong stem
+        
         let point_arr =
-            [`${ppml['12px'] * d.pos},5`,
-             `${ppml['12px'] * d.pos},${stct}`,
-             `${ppml['12px'] * (d.pos-size)},${vert}`,
-             `${ppml['12px'] * d.pos},${stct}`,
-             `${ppml['12px'] * (d.pos+size)},${vert}`,
-             `${ppml['12px'] * d.pos},${stct}`
+            [`${x_left},5`,
+             `${x_left},${y_stct}`,
+             `${x_right},${y_vert}`,
+             `${x_left},${y_stct}`,
+             `${ppml['12px'] * (d.pos+size)},${y_vert}`,
+             `${x_left},${y_stct}`
             ]
         return(point_arr.join(" "))
     }
