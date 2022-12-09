@@ -34,7 +34,7 @@ function rerender_random(both=false){
     rerender();
 }
 
-function rerender(nsplice=7){
+function rerender(){
     var spl_val = document.getElementById("splkey").value,
         ref_val = document.getElementById("refkey").value,
         gen_len = parseInt(document.getElementById("genkey").value);
@@ -46,19 +46,22 @@ function rerender(nsplice=7){
     splrand = setseed(spl_val);
     refrand = setseed(ref_val);
 
-    var tmp = generateGenome(gen_len, nsplice);
-    var genome = tmp.new_ref,
-        pos_donors = tmp.don,
-        pos_accpts = tmp.acc;
+    var clean_ref = generateCleanRef(gen_len),
+        exon_pos = generatePrecursorExons(clean_ref),
+        genome_info = generateGenome(clean_ref, exon_pos),
+        genome = genome_info.new_ref,
+        splice_pos = genome_info.don_acc,
+        exons = generateExons(genome, exon_pos)
+    //var pos_donors_accpts = {dons: tmp.don, accs: tmp.acc};
 
-    var exons = generateExons(tmp.new_ref),
-        all_possible_pairs = prepareCartesian(pos_donors, pos_accpts);
-
+    var all_possible_pairs = prepareCartesian(splice_pos.don, splice_pos.acc);
     var splice = makeValidSplicePairings(all_possible_pairs);
+
     var transcriptome = determineTranscriptome(genome, splice);
     var exons_spliced = determineSplicedExons(exons, splice)
 
-    renderAll(genome, transcriptome, exons, pos_donors, pos_accpts, splice);
+
+    renderAll(genome, transcriptome, exons, splice_pos, splice, exons_spliced);
 }
 
 

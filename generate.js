@@ -25,86 +25,89 @@ function generateCleanRef(wanted_len){
 }
 
 /** Add a rough number of splice sites to a clean reference with some spacing **/
-function addSpliceSites(refseq, rough_num, min_space=4){
-    var inserts = rough_num * 2; // double for acc and don
-    var working_seq = refseq,
-        work_len = working_seq.length,
-        split_map = {};
-    while (--inserts > 0){
-        // First define a split and see if it's close to other splits
-        // - if it's too close, then try again.
-        let max_tries = 1000,
-            not_found = true,
-            split_map_keys = Object.keys(split_map); // current splits
-        var new_split_index;
-        while ((--max_tries > 0) && not_found){
-            new_split_index = Math.floor(refrand() * work_len);
-            // Test it against all other splits
-            var passes_all = split_map_keys.length;
-            
-            for (var s=0; s < split_map_keys.length; s++){
-                let old_split_index = split_map[split_map_keys[s]];
-                let buff_beg = old_split_index - min_space,
-                    buff_end = old_split_index + min_space;
-                if ((new_split_index > buff_beg) && (new_split_index < buff_end)){
-                    // keep searching!
-                } else {
-                    // valid against one split
-                    passes_all--;
-                }
-            }
-            if (passes_all === 0){break;}
+function addSpliceSites(clean_ref, exons){
+    var acc_normal = exons.map(x => x.beg - 2),
+        don_normal = exons.map(x => x.end);
+
+    var nsplice = Math.floor(clean_ref.length / 30)   // 1 spurious ss every 20bp
+
+    // var splice_map = {}
+    // for (var p=0; p < acc_normal; p++){
+    //     //splice_map[
+    // }
+
+    // // Add spurious sites
+    // for (var ad=0; ad < nsplice; ad++){
+    //     let new_site = Math.floor(1 + refrand() * (clean_ref.length - 1))
+    //     if (refrand() > 0.5){
+    //         acc_normal.push(new_site)
+    //     } else {
+    //         don_normal.push(new_site)
+    //     }
+    // }
+    acc_normal.sort((x,y) => x - y)
+    don_normal.sort((x,y) => x - y)
+
+    // // Insert the sites at the above positions
+    var working_seq = clean_ref;
+    function insertSplice(site_arr, site_ss){
+        for (let i=0; i < site_arr.length; i++){
+            let [left,right] = splitAtIndex(working_seq, site_arr[i])
+            left = left.substring(0, left.length)
+            right = right.substring(2, right.length)
+            working_seq = left + site_ss + right;
         }
-        if (max_tries <= 0){
-            console.error("Failed");
-        }
-        var [left,right] = splitAtIndex(working_seq, new_split_index);
-        // correct for the 2bp insertion
-        left = left.substring(0,left.length-1);
-        right = right.substring(1,right.length);
-        middle = ((refrand() > 0.5)?acc:don); // donor or acceptor sequence
-        working_seq = left + middle + right;
-        // finally replace any accidental AGT's with AAGGGT, to prevent double donor acceptor overlap.
-        working_seq = working_seq.split("AGT").join("ACT");
-        //
-        split_map[new_split_index] = new_split_index; // "10" = 10
     }
-    
-    // Scan for acc and don
-    var don_pos = getIndicesOf(don, working_seq);
-    var acc_pos = getIndicesOf(acc, working_seq);
-    
-    return ({cln_ref: refseq, new_ref:working_seq,
-             don:don_pos, acc:acc_pos});
+    insertSplice(acc_normal, acc)
+    insertSplice(don_normal, don)
+
+    return ({new_ref: working_seq,
+             don_acc: {
+                 don:don_normal,
+                 acc:acc_normal}
+            });
 }
 
 /** Generate a Genome reference of desired length and desired num splice sites **/
-function generateGenome(wanted_len, nsplice){
-    return(addSpliceSites(generateCleanRef(wanted_len), nsplice));
+function generateGenome(clean_ref, exons){
+    return(addSpliceSites(clean_ref, exons));
 }
 
 
-/** Generate ~N Exons within size limits from a reference **/
-function generateExons(ref, nexons=5, min_s=5, max_s=30){
-    var exons = [],
+/** Determine exon positions from a reference **/
+function generatePrecursorExons(clean_ref, spacing=4, min_s=4, max_s=30){
+    var exon_pos = [],
         index = 0,
-        exonspace = ref.length / 2; // number of exon spaces
+        exonspace = clean_ref.length / 2; // number of exon spaces
 
-    while (index < ref.length){
-        var ex_start = 1 + index + Math.floor((refrand()*exonspace) / 2),
-            // divide 2 again to increase chance of early start in the exon space
-            ex_len = Math.floor(min_s + (refrand()*max_s)),
+    while (index < clean_ref.length){
+        let max_tries = 1000,
+            ex_start = 0;
+        while (--max_tries > 0){
+            ex_start = 1 + index + Math.floor((refrand()*exonspace) / 2)
+            if (ex_start > index + spacing){
+                break
+            }
+        }
+        var ex_len = Math.floor(min_s + (refrand()*max_s)),
             ex_end = ex_start + ex_len;
 
-        if (ex_start > ref.length){break;}
-        if (ex_end > ref.length){
-            ex_end = ref.length;
+        if (ex_start > clean_ref.length){break;}
+        if (ex_end > clean_ref.length){
+            ex_end = clean_ref.length;
             ex_len = ex_end - ex_start;
             if (ex_len < min_s){break;}
         }
-        ex_seq = ref.substr(ex_start, ex_len);
-        exons.push({beg: ex_start, end: ex_end, len: ex_len, seq: ex_seq});
+        //ex_seq = clean_ref.substr(ex_start, ex_len);
+        exon_pos.push({beg: ex_start, end: ex_end, len: ex_len}); //, seq: ex_seq});
         index = ex_end;
     }
-    return(exons);
+    return(exon_pos);
+}
+
+/** Generate ~N Exons within size limits from a clean reference, which will be used to
+ * determine positions of normal splice sites **/
+function generateExons(ref, exon_positions){
+    exon_positions.map(x => x["seq"] = ref.substring(x.beg, x.end))
+    return(exon_positions);
 }

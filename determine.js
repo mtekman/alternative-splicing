@@ -78,12 +78,15 @@ function determineSplicedExons(exons, splice){
         // Sort the positions to slice out, and reverse
         positions_to_slice_out.sort((x,y) => y[1] - x[1])
         // Slice
-        var working_exon = exon.seq;
+        var working_exon = exon.seq
         for (var p=0; p < positions_to_slice_out.length; p++){
             var slice_pair = positions_to_slice_out[p]
-            working_exon = splitAtIndex(working_exon, slice_pair[0] - exon.beg)[0] +
+            working_exon =
+                splitAtIndex(working_exon, slice_pair[0] - exon.beg)[0] +
                 "" +
-                splitAtIndex(working_exon, slice_pair[1] - exon.beg)[1]
+                splitAtIndex(working_exon, slice_pair[1] - exon.beg)[1];
+
+            
         }
         spliced_exons.push(working_exon)
     }

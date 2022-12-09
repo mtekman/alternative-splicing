@@ -7,7 +7,7 @@ const ppml = {'12px' : 7.21,
               '8px' : 4.8}
 const off_col = 10,
       spl_row = 30,
-      ref_row = 50,
+      ref_row = 46,
       exn_row = 90,
       tra_row = 200;
 
@@ -122,14 +122,12 @@ function renderPairings(pairings){
                 .text(d => d.name),
             exit => exit.transition(t).remove().attr("opacity", "0")
         ).call(texts => texts.transition(t)
-               .attr("y", 0)
+               .attr("y", -1)
                .text(d => d.name));
 }
 
 function renderSpliceJunctions(splice, offset_x){
     var spj_group = primeGroup("spljunc", {x:offset_x, y:tra_row}, true) // bind to tra row
-
-
 
     let poly = spj_group.selectAll("polygon");
     let seqs = spj_group.selectAll("text");
@@ -150,7 +148,7 @@ function renderSpliceJunctions(splice, offset_x){
         return(-10*((i%3)+1)) // prong
     }
 
-    poly = poly.data(splice, d => d)
+    poly = poly.data(splice, (d,i) => i)
         .join(
             enter => enter.append("polygon")
                 .attr("points", makeY)
@@ -166,7 +164,7 @@ function renderSpliceJunctions(splice, offset_x){
                .attr("transform", "translate(0,0)")
                .attr("opacity", 1));
 
-    seqs = seqs.data(splice, d => d)
+    seqs = seqs.data(splice, d => d.seq)
         .join(
             enter => enter.append("text")
                 .text(d => d.seq)
@@ -262,15 +260,15 @@ function renderSequence(grp_name, trans_offsets, seq, title_text, update_x_alway
     return(grp)
 }
 
-function renderDonAcc(pos_donors, pos_accpts){
+function renderDonAcc(pos_donors_accpts){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
 
     // Highlight Donors and Acceptors
     // -- First build a named array
-    let don_acc = pos_donors.map(function(x,i){
+    let don_acc = pos_donors_accpts.don.map(function(x,i){
         return({val:x, name: "D"+i, fill: "red" });
     });
-    let acc_arr = pos_accpts.map(function(x,i){
+    let acc_arr = pos_donors_accpts.acc.map(function(x,i){
         return({val:x, name: "A"+i, fill: "blue" });
     });
     don_acc.push.apply(don_acc, acc_arr);
@@ -291,12 +289,16 @@ function renderDonAcc(pos_donors, pos_accpts){
         ).call(dag => dag.transition(t).attr("y", -2));
 }
 
+function renderSplicedExons(spliced_exons){
+    
+}
 
-function renderAll(seq, transcriptome, exons, pos_donors, pos_accpts, splice){
+
+function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced_exons){
     renderGenome(seq)
-    renderDonAcc(pos_donors, pos_accpts);
+    renderDonAcc(pos_donors_accpts);
     renderExons(exons);
     renderPairings(splice);
     renderTranscriptome(transcriptome);
-    //renderSplicedExons(exons, splice)
+    renderSplicedExons(spliced_exons)
 }
