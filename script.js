@@ -56,7 +56,6 @@ function rerender(nsplice=7){
 
     var pairings = makeValidSplicePairings(all_possible_pairs);
     var transcriptome_info = determineTranscriptome(genome, pairings);
-    console.log(transcriptome_info)
 
     renderAll(genome, transcriptome_info, exons, pos_donors, pos_accpts, pairings);
 }
@@ -75,22 +74,31 @@ function determineTranscriptome(genome, pairings){
     }
     transcriptome.push(genome.substring(last_cut_index, genome.length))
 
-    var splice_pos = [{pos:transcriptome[0].length, size:(pairings[0].acc - pairings[0].don)}],
+    function getSizeandSequence(pos, pair){
+        var size = (pair.acc + 2) - pair.don;
+        var seq = genome.substring(pair.don, pair.acc + 2)
+        return({pos:pos, seq:seq,size:size})
+    }
+
+    var splice_pos = [getSizeandSequence(transcriptome[0].length, pairings[0])],
         cumul = splice_pos[0].pos;
     for (var s=1; s < transcriptome.length; s++){
         var tlen = transcriptome[s].length
+        var spl = pairings[s]
         var currlen = cumul + tlen;
-        if (tlen > 0){
-            splice_pos.push({pos:currlen, size:(pairings[s].acc - pairings[s].don)})
+        if (tlen > 0 && spl !== undefined){
+            splice_pos.push(getSizeandSequence(currlen, pairings[s]))
         }
         cumul = currlen
     }
-    return({trans:transcriptome.join(""), splice:splice_pos});
+    return({seq:transcriptome.join(""), splice:splice_pos});
 }
 
 window.onload = function(){
     svg = d3.select("#svg-div").append("svg")
         .attr('viewBox', '0 0 800 300')
+    // all groups are contained within a single parent group
+    svg_group = svg.append("g")
 
     initUpdateOnTextboxEdit()
 };

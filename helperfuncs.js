@@ -81,12 +81,20 @@ function makeValidSplicePairings(all_possible_pairs, min=2, max=5){
     return(spees)
 }
 
-/** Check if a D3 group is empty, if so add it **/
-function primeGroup(name, transformcallback){
+/** Check if a D3 group is empty, if so add it. **/
+function primeGroup(name, trans_offsets, update_always=false){
+    function transform(d){
+        let x = trans_offsets.x,
+            y = trans_offsets.y;
+        return(`translate(${x},${y})`);
+    }    
     var new_group = d3.select("#" + name)
+    
     if (new_group.empty()){
-        new_group = svg.append("g").attr("id", name)
-            .attr("transform", transformcallback)
+        new_group = svg_group.append("g").attr("id", name)
+            .attr("transform", transform)
+    } else {
+        new_group.attr("transform", transform())
     }
     return (new_group)
 }

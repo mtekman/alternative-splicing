@@ -1,12 +1,13 @@
 var svg;
+var svg_group;
+var t; // transition elem
 
 const ppml = 7.21; // pixels per monospace letter
 const off_col = 10,
       spl_row = 30,
       ref_row = 50,
-      exn_row = 90;
-
-var t; // transition elem
+      exn_row = 90,
+      tra_row = 180;
 
 /** Determine the new SVG viewport size based on the genome length **/
 function newViewportSize(genome_length){
@@ -22,11 +23,7 @@ function renderExons(exons){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
 
     // Setup Exons on Reference
-    var exn_grp = primeGroup("exons", function(d){
-        let x = off_col,
-            y = exn_row;
-        return(`translate(${x},${y})`);
-    });
+    var exn_grp = primeGroup("exons", {x:off_col,y:exn_row})
     exons.map((x,i) => x["name"]="Ex" + (i+1));
 
     let blocks = exn_grp.selectAll("rect"),
@@ -89,11 +86,7 @@ function renderPairings(pairings){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
 
     // Setup Splice Pairings
-    var spl_grp = primeGroup("splices", function(d){
-        let x = off_col,
-            y = spl_row;
-        return(`translate(${x},${y})`);
-    });
+    var spl_grp = primeGroup("splices", {x:off_col,y:spl_row})
 
     let blocks = spl_grp.selectAll("rect"),
         texts = spl_grp.selectAll("text");
@@ -128,23 +121,34 @@ function renderPairings(pairings){
                .text(d => d.name));
 }
 
-function renderTranscriptome(transcriptome, pos_splice){
-
-}
-
-function renderRefDonAcc(seq, pos_donors, pos_accpts){
+function renderTranscriptome(transcriptome){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
 
-    // Setup Reference
-    var ref_grp = primeGroup("ref", function(d){
-        let x = off_col,
-            y = ref_row;
-        return(`translate(${x},${y})`);
-    });
+    function calculateLeftOffset(){
+        var spliced_out = transcriptome.splice.map(x => x.size).reduce((x,y) => x + y)
+        return(Math.floor(ppml * spliced_out / 2) + off_col)        
+    }
+    renderSequence("trans",
+                   {x:calculateLeftOffset(), y:tra_row},
+                   transcriptome.seq,
+                   "Transcriptome",
+                   true)
+   
+}
 
-    let border = ref_grp.selectAll("rect"),
-        refs = ref_grp.selectAll("text[class='reference']"),
-        title = ref_grp.selectAll("text[class='title']")
+function renderGenome(seq){
+    renderSequence("gen", {x:off_col, y:ref_row}, seq, "Genome")
+}
+
+
+function renderSequence(grp_name, trans_offsets, seq, title_text, update_x_always=false){
+    t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
+    // Setup Reference
+    var grp = primeGroup(grp_name, trans_offsets, update_x_always);
+
+    let border = grp.selectAll("rect"),
+        seqs = grp.selectAll("text[class='sequence']"),
+        title = grp.selectAll("text[class='title']")
 
     border = border.data([{0:seq}], (d,i) => i) // should never change
         .join(
@@ -158,28 +162,28 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
             update => update.transition(t).attr("width", seq.length * ppml),
             exit => exit.transition(t).remove()
         ).call(border => border.transition(t)
-               .attr("y", 0));
-
-    refs = refs.data([{seq:seq}], d => d.seq)
+               .attr("y", 0));  
+    
+    seqs = seqs.data([{seq:seq}], d => d.seq)
         .join(
             enter => enter.append("text")
                 .style("font-family", "monospace")
                 .text(d => d.seq)
-                .attr("class", "reference")
+                .attr("class", "sequence")
                 .attr("x", 0)
                 .attr("y", 11)
                 .attr("opacity", 0),
             update => update,
             exit => exit.remove().attr("opacity", "0")
-        ).call(refs => refs.transition(t).attr("opacity", 1));
+        ).call(seqs => seqs.transition(t).attr("opacity", 1));
 
-    title = title.data([{0:"Genome"}], (d,i) => i) // Should also never change
+    title = title.data([{0:title_text}], (d,i) => i) // Should also never change
         .join(
             enter => enter.append("text")
                 .style("font-family", "sans")
                 .style("font-size", "6pt")
                 .attr("class", "title")
-                .text("Genome")
+                .text(title_text)
                 .attr("y", 20)
                 .attr("x", -20)
                 .attr("opacity", 0),
@@ -187,8 +191,12 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
             exit => exit.transition(t).remove()
         ).call(title => title.transition(t).attr("opacity", 1).attr("x",0))
 
+    return(grp)
+}
 
-
+function renderDonAcc(pos_donors, pos_accpts){
+    t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
+   
     // Highlight Donors and Acceptors
     // -- First build a named array
     let don_acc = pos_donors.map(function(x,i){
@@ -199,12 +207,7 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
     });
     don_acc.push.apply(don_acc, acc_arr);
 
-    var dac_grp = primeGroup(
-        "dac", function(d){
-            let x = off_col,
-                y = ref_row; // mirror reference, with some offset
-            return(`translate(${x},${y})`);
-        });
+    var dac_grp = primeGroup("dac", {x:off_col,y:ref_row})
 
     let dag = dac_grp.selectAll("text");
     dag = dag.data(don_acc, d => d.name)
@@ -222,8 +225,9 @@ function renderRefDonAcc(seq, pos_donors, pos_accpts){
 
 
 function renderAll(seq, transcriptome, exons, pos_donors, pos_accpts, pairings){
-    renderRefDonAcc(seq, pos_donors, pos_accpts);
+    renderGenome(seq)
+    renderDonAcc(pos_donors, pos_accpts);
     renderExons(exons);
     renderPairings(pairings);
-    //renderTranscriptome(transcriptome);
+    renderTranscriptome(transcriptome);
 }
