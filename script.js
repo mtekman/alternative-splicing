@@ -60,39 +60,7 @@ function rerender(nsplice=7){
     renderAll(genome, transcriptome_info, exons, pos_donors, pos_accpts, pairings);
 }
 
-/** Determine transcripts from the splice pairings and exon  sequences **/
-function determineTranscriptome(genome, pairings){
-    // First determine whether and where a splice site bisects an exon/intron
-    // Then, for each pairing determine whether it's the same exon/intron
-    // Finally deliver the modified sequence.
-    var transcriptome=[],
-        last_cut_index = 0
-    for (var p=0; p < pairings.length; p++){
-        // Slice the genome
-        transcriptome.push(genome.substring(last_cut_index, pairings[p].don))
-        last_cut_index = pairings[p].acc + 2
-    }
-    transcriptome.push(genome.substring(last_cut_index, genome.length))
 
-    function getSizeandSequence(pos, pair){
-        var size = (pair.acc + 2) - pair.don;
-        var seq = genome.substring(pair.don, pair.acc + 2)
-        return({pos:pos, seq:seq,size:size})
-    }
-
-    var splice_pos = [getSizeandSequence(transcriptome[0].length, pairings[0])],
-        cumul = splice_pos[0].pos;
-    for (var s=1; s < transcriptome.length; s++){
-        var tlen = transcriptome[s].length
-        var spl = pairings[s]
-        var currlen = cumul + tlen;
-        if (tlen > 0 && spl !== undefined){
-            splice_pos.push(getSizeandSequence(currlen, pairings[s]))
-        }
-        cumul = currlen
-    }
-    return({seq:transcriptome.join(""), splice:splice_pos});
-}
 
 window.onload = function(){
     svg = d3.select("#svg-div").append("svg")

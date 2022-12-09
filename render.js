@@ -129,7 +129,7 @@ function renderPairings(pairings){
 function renderSpliceJunctions(splice, offset_x){
     var spj_group = primeGroup("spljunc", {x:offset_x, y:tra_row}, true) // bind to tra row
 
-    console.log(splice)
+
 
     let poly = spj_group.selectAll("polygon");
     let seqs = spj_group.selectAll("text");
@@ -185,6 +185,7 @@ function renderSpliceJunctions(splice, offset_x){
         ).call(seqs => seqs.transition(t).attr("opacity",1).attr("y", seqPlace))
 }
 
+/** Render the transcriptome sequence and center it **/
 function renderTranscriptome(transcriptome){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
 
@@ -297,4 +298,5 @@ function renderAll(seq, transcriptome, exons, pos_donors, pos_accpts, pairings){
     renderExons(exons);
     renderPairings(pairings);
     renderTranscriptome(transcriptome);
+    renderSplicedExons(exons, pairings)
 }
