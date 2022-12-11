@@ -68,6 +68,35 @@ function rerender(){
     renderAll(genome, transcriptome, exons, splice_pos, splice, exons_spliced);
 }
 
+function zoomtoggle(enable, parentNode){
+    console.log(enable, parentNode)
+    const zoom = d3.zoom().on('zoom', e => {
+        svg_group.attr("transform", (transform = e.transform));
+    });
+    const svg_div = document.getElementById("svg-div")
+
+    function hoverOn(node){node.style.opacity="0.5"}
+    function hoverOff(node){node.style.opacity="1"}
+    
+    if (enable) {
+        svg.call(zoom)
+        svg.style.border = ""
+        parentNode.style.opacity = "1"
+        parentNode.onmouseover = undefined;
+        parentNode.onmouseout = undefined;
+        svg_div.style.border = "2px solid blue"
+        svg_div.style.borderRadius = "10px"
+    }
+    else {
+        svg.on('.zoom', null)
+        svg.style("border", "")
+        parentNode.style.opacity = "0.5"
+        svg_div.style.border = ""
+        parentNode.onmouseover = function(){parentNode.style.opacity="1";}
+        parentNode.onmouseout = function(){parentNode.style.opacity="0.5";}
+    }
+    parentNode.style.filter = "drop-shadow(2px 2px 5px #0000ff)"
+}
 
 
 window.onload = function(){
@@ -75,10 +104,7 @@ window.onload = function(){
     // all groups are contained within a single parent group
     svg_group = svg.append("g")
 
-    const zoom = d3.zoom().on('zoom', e => {
-        svg_group.attr("transform", (transform = e.transform));
-    });
-    svg.call(zoom);
+    zoomtoggle(false, document.getElementById("zoom"))
     
     initUpdateOnTextboxEdit()
 };
