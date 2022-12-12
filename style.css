@@ -157,11 +157,9 @@ body {
 }
 
 #zoom {
-  margin-left: 89%;
-  width: 10%;
   display: flex;
   flex-direction: row;
-  opacity: 20%;
+  opacity: 10%;
   padding: 0.4em;
 }
 

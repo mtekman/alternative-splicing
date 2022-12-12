@@ -61,15 +61,14 @@ function rerender(){
         exons_spliced = null;
     if (splice.length > 0){
         transcriptome = determineTranscriptome(genome, splice);
-        exons_spliced = determineSplicedExons(exons, splice)
+        exons_spliced = determineSplicedExons(exons, splice, transcriptome.tr2go)
+        console.log(transcriptome, exons_spliced)
     }
-
-
-    renderAll(genome, transcriptome, exons, splice_pos, splice, exons_spliced);
+    renderAll(genome, transcriptome, exons,
+              splice_pos, splice, exons_spliced);
 }
 
 function zoomtoggle(enable, parentNode){
-    console.log(enable, parentNode)
     const zoom = d3.zoom().on('zoom', e => {
         svg_group.attr("transform", (transform = e.transform));
     });
@@ -84,16 +83,16 @@ function zoomtoggle(enable, parentNode){
         parentNode.style.opacity = "1"
         parentNode.onmouseover = undefined;
         parentNode.onmouseout = undefined;
-        svg_div.style.border = "2px solid blue"
-        svg_div.style.borderRadius = "10px"
+        //svg_div.style.background = "white"
+        //svg_div.style.borderRadius = "20px"
     }
     else {
         svg.on('.zoom', null)
         svg.style("border", "")
-        parentNode.style.opacity = "0.5"
-        svg_div.style.border = ""
+        parentNode.style.opacity = "0.1"
+        //svg_div.style.border = ""
         parentNode.onmouseover = function(){parentNode.style.opacity="1";}
-        parentNode.onmouseout = function(){parentNode.style.opacity="0.5";}
+        parentNode.onmouseout = function(){parentNode.style.opacity="0.1";}
     }
     parentNode.style.filter = "drop-shadow(2px 2px 5px #0000ff)"
 }

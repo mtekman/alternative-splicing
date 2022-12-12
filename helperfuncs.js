@@ -76,7 +76,7 @@ function makeValidSplicePairings(all_possible_pairs, min=2, max=5){
         spees = makeSplicePairings(all_possible_pairs)
         num_pairings = spees.length;
     }
-    spees.map(x=> x.name = x.don+ "-" +x.acc)
+    spees.map(x=> x.name = x.don + "-" + (x.acc+2))
     //console.log("Found after: ", 1001-max_loops, " loops")
     return(spees)
 }
