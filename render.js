@@ -12,6 +12,9 @@ const off_col = 10,
       tra_row = 200,
       esp_row = 240;
 
+const exon_height = 30,
+      intron_height = 5;
+
 /** Determine the new SVG viewport size based on the genome length **/
 function newViewportSize(genome_length){
     var width = (off_col + genome_length) * ppml['12px']
@@ -44,7 +47,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
         .join(
             enter => enter.append("rect")
                 .attr("fill", "grey")
-                .attr("height", 30)
+                .attr("height", exon_height)
                 .attr("width", 0)
                 .attr("x", d => ppml['12px'] * d.beg)
                 .attr("class","shadowdrop"),
@@ -57,7 +60,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
                 .attr("opacity", "0")
         ).call(blocks => blocks.transition(t)
                .attr("fill", (d,i) => d3.schemeCategory10[i])
-               .attr("height", 30)
+               .attr("height", exon_height)
                .attr("width", d => ppml['12px'] * d.len)
                .attr("x", d => ppml['12px'] * d.beg));
 
@@ -326,12 +329,53 @@ function renderSplicedExons(spliced_exons, transcript_offset){
     renderExons(spliced_exons, "transcript-exons", {x:transcript_offset,y:esp_row}, true)
 }
 
+function renderIntrons(exons, transcript_offset){
+    // Determine Intron positions
+    var introns = exons
+        .filter(x => x.len > 0)
+        .sort((x,y) => x.beg - y.beg)
+        .reduce((acc,x,i,arr) => {
+            if (i == 0){acc = []}
+            else {acc.push([arr[i-1].end, arr[i].beg])};
+            return(acc)
+        }, [])
+        .filter(x => (x[1] - x[0] > 0))
+        .map(x => {return({beg:x[0], end:x[1], len:x[1] - x[0]})})
+    console.log(introns)
+
+    let int_group = primeGroup("intron", {x:transcript_offset,
+                                          y:exn_row + (exon_height/2) - (intron_height/2)})
+    let blocks = int_group.selectAll("rect");
+    
+    blocks = blocks.data(introns, (d,i) => i)
+        .join(
+            enter => enter.append("rect")
+                .attr("fill", "#aaa")
+                .attr("height", intron_height)
+                .attr("width", 0)
+                .attr("x", d => ppml['12px'] * d.beg),
+            update => update.transition(t)
+                .attr("opacity", "1")
+                .attr("width", d => ppml['12px'] * d.len)
+                .attr("x", d => ppml['12px'] * d.beg),
+            exit => exit.transition(t).remove()
+                .attr("opacity", "0")
+        ).call(blocks => blocks.transition(t)
+               .attr("height", intron_height)
+               .attr("width", d => ppml['12px'] * d.len)
+               .attr("x", d => ppml['12px'] * d.beg));
+    
+    
+}
+
 
 function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced_exons){
     renderGenome(seq)
     renderDonAcc(pos_donors_accpts);
     renderGenomeExons(exons);
+    renderIntrons(exons, off_col);
     renderPairings(splice);
     var loff = renderTranscriptome(transcriptome);
     renderSplicedExons(spliced_exons, loff)
+    //renderIntrons(spliced_exons, loff);
 }
