@@ -9,7 +9,8 @@ const off_col = 10,
       spl_row = 30,
       ref_row = 46,
       exn_row = 90,
-      tra_row = 200;
+      tra_row = 200,
+      esp_row = 240;
 
 /** Determine the new SVG viewport size based on the genome length **/
 function newViewportSize(genome_length){
@@ -20,18 +21,25 @@ function newViewportSize(genome_length){
     svg.attr('viewBox', `0 0 ${width} 300`)
 }
 
+function renderGenomeExons(exons){
+    // Setup Exons on Reference
+    renderExons(exons, "genome-exons", {x:off_col,y:exn_row})
+}
 
-function renderExons(exons){
+
+function renderExons(exons, grpname, offsets, update_always=false){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
 
-    // Setup Exons on Reference
-    var exn_grp = primeGroup("exons", {x:off_col,y:exn_row})
-    exons.map((x,i) => x["name"]="Ex" + (i+1));
+    var exn_grp = primeGroup(grpname, offsets, update_always)
 
     let blocks = exn_grp.selectAll("rect"),
         sequences = exn_grp.selectAll("text[class='sequences']"),
         labels = exn_grp.selectAll("text[class='labels']");
 
+    // Exons with a non-zero sequence length. We still feed the blocks the original data
+    // to preserve the colouring though.
+    var filter_exons = exons.filter(d => d.len > 0)
+    
     blocks = blocks.data(exons, d => d.name)
         .join(
             enter => enter.append("rect")
@@ -53,7 +61,7 @@ function renderExons(exons){
                .attr("width", d => ppml['12px'] * d.len)
                .attr("x", d => ppml['12px'] * d.beg));
 
-    sequences = sequences.data(exons, d => d.name)
+    sequences = sequences.data(filter_exons, d => d.name)
         .join(
             enter => enter.append("text") // sequence
                 .attr("x", d => ppml['12px'] * d.beg)
@@ -69,7 +77,7 @@ function renderExons(exons){
         ).call(sequences => sequences.transition(t)
                .attr("y", 0));
 
-    labels = labels.data(exons, d => d.name)
+    labels = labels.data(filter_exons, d => d.name)
         .join(
             enter => enter.append("text") // label, rotated 90
                 .attr("x", d => ppml['12px'] * (d.beg + ((d.end - d.beg)/2) - 2))
@@ -147,16 +155,16 @@ function renderSpliceJunctions(splice, offset_x){
 
     let poly = spj_group.selectAll("polyline");
     let seqs = spj_group.selectAll("text");
-    
+
     function makeY(d,i){
         let size = Math.floor(d.size / 10),
             x_left = ppml['12px'] * d.pos,
             x_right = ppml['12px'] * (d.pos+size),
             y_vert = -10*((i%3)+1), // prong
             y_stct = y_vert + 5;      // prong stem
-        
+
         let point_arr =
-            [`${x_left},5`,
+            [`${x_left},100`,
              `${x_left},${y_stct}`,
              `${x_right},${y_vert}`,
              `${x_left},${y_stct}`,
@@ -205,7 +213,8 @@ function renderSpliceJunctions(splice, offset_x){
         ).call(seqs => seqs.transition(t).attr("opacity",1).attr("y", seqPlace))
 }
 
-/** Render the transcriptome sequence and center it **/
+/** Render the transcriptome sequence and center it. Return padding offset to use for
+ * spliced exon positioning **/
 function renderTranscriptome(transcriptome){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
 
@@ -221,6 +230,7 @@ function renderTranscriptome(transcriptome){
                    true)
 
     renderSpliceJunctions(transcriptome.splice, left_off)
+    return(left_off)
 }
 
 function renderGenome(seq){
@@ -311,16 +321,17 @@ function renderDonAcc(pos_donors_accpts){
         ).call(dag => dag.transition(t).attr("y", -2));
 }
 
-function renderSplicedExons(spliced_exons){
-
+function renderSplicedExons(spliced_exons, transcript_offset){
+    // Setup Exons on Transcipt
+    renderExons(spliced_exons, "transcript-exons", {x:transcript_offset,y:esp_row}, true)
 }
 
 
 function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced_exons){
     renderGenome(seq)
     renderDonAcc(pos_donors_accpts);
-    renderExons(exons);
+    renderGenomeExons(exons);
     renderPairings(splice);
-    renderTranscriptome(transcriptome);
-    renderSplicedExons(spliced_exons)
+    var loff = renderTranscriptome(transcriptome);
+    renderSplicedExons(spliced_exons, loff)
 }

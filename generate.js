@@ -114,5 +114,6 @@ function generatePrecursorExons(clean_ref, spacing=4, min_s=4, max_s=30){
  * determine positions of normal splice sites **/
 function generateExons(ref, exon_positions){
     exon_positions.map(x => x["seq"] = ref.substring(x.beg, x.end))
+    exon_positions.map((x,i) => x["name"]="Ex" + (i+1));
     return(exon_positions);
 }

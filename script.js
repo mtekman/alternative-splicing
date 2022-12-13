@@ -61,8 +61,8 @@ function rerender(){
         exons_spliced = null;
     if (splice.length > 0){
         transcriptome = determineTranscriptome(genome, splice);
-        exons_spliced = determineSplicedExons(exons, splice, transcriptome.tr2go)
-        console.log(transcriptome, exons_spliced)
+        exons_spliced = determineSplicedExons(exons, splice)
+        //console.log(exons, exons_spliced)
     }
     renderAll(genome, transcriptome, exons,
               splice_pos, splice, exons_spliced);

@@ -40,24 +40,33 @@ function determineTranscriptome(genome, pairings){
 
 
 /** Determine the sequences of spliced exons, and provide a judgement **/
-function determineSplicedExons(exons, splice, trans_genome_map){
+function determineSplicedExons(exons, splice){
     // For each exon (beg,end), check the splice site (acc, don) overlap
     var spliced_exons = [];
-    
+    var cumul_previous_shortening = 0;
+
     for (var e=0; e < exons.length; e++){
         var exon = exons[e],
-            ex_beg = exon.beg, ex_end = exon.end;
-        
+            ex_beg = exon.beg,
+            ex_end = exon.end;
+
         // we build a list of positions to slice, then slice them in reverse position
         // order to keep the positions relevant after each operation
-        var positions_to_slice_out = [];
+        var positions_to_slice_out = [],
+            exon_shortening = 0; // count the previous splice sites and subtract from exon
+                                 // start to get the new position of the exon on the
+                                 // transcript
 
         for (var s=0; s < splice.length; s++){
             var ssite = splice[s],
                 ss_beg = ssite.don, ss_end = ssite.acc;
 
-            if ((ss_beg > ex_end) || (ss_end < ex_beg)){
+            if (ss_beg > ex_end){
                 continue; // reject ss if out of bounds
+            }
+            if (ss_end < ex_beg){
+                exon_shortening += (ss_end + 2 - ss_beg)
+                continue; // also reject if OOB, but store info because it affects the exon start
             }
             // We deal with the x or more splice sites that can splice an Exon
             // into the 4 Scenarios:
@@ -77,22 +86,29 @@ function determineSplicedExons(exons, splice, trans_genome_map){
             }
             // 4) Splice end overlaps begin of exon
             else if ((ss_beg < ex_beg) && (ss_end > ex_beg)){
+                exon_shortening += (ex_beg - ss_beg)
                 positions_to_slice_out.push([ex_beg, ss_end + 2])
             }
         }
         // Sort the positions to slice out, and reverse
         positions_to_slice_out.sort((x,y) => y[1] - x[1])
         // Slice
-        var working_exon = exon.seq,
-            exon_start = 0
+        var working_exon = exon.seq;
         for (var p=0; p < positions_to_slice_out.length; p++){
             var slice_pair = positions_to_slice_out[p]
             working_exon =
                 splitAtIndex(working_exon, slice_pair[0] - exon.beg)[0] +
                 "" +
                 splitAtIndex(working_exon, slice_pair[1] - exon.beg)[1];
+            //
         }
-        spliced_exons.push(working_exon)
+        var new_beg = ex_beg - (exon_shortening),
+            new_len = working_exon.length,
+            new_end = new_beg + new_len;
+
+        // 100 step tone, duty yard
+        spliced_exons.push({beg: new_beg, end: new_end, len: new_len, name: exon.name, seq: working_exon})
+        //cumul_previous_shortening = exon.seq.length - working_exon.length;
     }
     return(spliced_exons)
 }
