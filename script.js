@@ -25,16 +25,31 @@ function initUpdateOnTextboxEdit(){
 }
 
 function rerender_random(both=false){
-    var randwords = words(2);
-    document.getElementById("splkey").value = randwords[1];
+    var [new_ref, new_spl] = words(2);
     both = both || document.getElementById("bothkeys").checked
+    document.getElementById("splkey").value = new_spl;
     if (both){
-        document.getElementById("refkey").value = randwords[0];
+        document.getElementById("refkey").value = new_ref;
+    } else {
+        new_ref = document.getElementById("refkey").value
     }
+    setURLParams(new_ref, new_spl)
     rerender();
 }
 
+function setURLParams(ref,spl){
+    window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}`)
+}
+
+function getURLParams(){
+    var defs = new URLSearchParams(window.location.search)
+    document.getElementById("splkey").value = defs.get("spl")
+    document.getElementById("refkey").value = defs.get("ref")
+}
+
 function rerender(){
+    console.log("boik")
+    getURLParams()
     var spl_val = document.getElementById("splkey").value,
         ref_val = document.getElementById("refkey").value,
         gen_len = parseInt(document.getElementById("genkey").value);
@@ -106,4 +121,6 @@ window.onload = function(){
     zoomtoggle(false, document.getElementById("zoom"))
     
     initUpdateOnTextboxEdit()
+
+    window.onpopstate = rerender; // when history changes, update
 };

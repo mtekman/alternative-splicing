@@ -49,6 +49,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
                 .attr("fill", "grey")
                 .attr("height", exon_height)
                 .attr("width", 0)
+                .attr("y", -50)
                 .attr("x", d => ppml['12px'] * d.beg)
                 .attr("class","shadowdrop"),
             update => update.transition(t)
@@ -62,6 +63,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
                .attr("fill", (d,i) => d3.schemeCategory10[i])
                .attr("height", exon_height)
                .attr("width", d => ppml['12px'] * d.len)
+               .attr("y", 0)
                .attr("x", d => ppml['12px'] * d.beg));
 
     sequences = sequences.data(filter_exons, d => d.name)
@@ -160,19 +162,26 @@ function renderSpliceJunctions(splice, offset_x){
     let seqs = spj_group.selectAll("text");
 
     function makeY(d,i){
-        let size = Math.floor(d.size / 10),
-            x_left = ppml['12px'] * d.pos,
-            x_right = ppml['12px'] * (d.pos+size),
-            y_vert = -10*((i%3)+1), // prong
-            y_stct = y_vert + 5;      // prong stem
+        let size = ppml['8px'] * Math.floor(d.size/2),
+            x_margin = 3,
+            x_mid = ppml['12px'] * d.pos,
+            x_left = x_mid - (size + x_margin),
+            x_right = x_mid + (size + x_margin),
+            y_needle = 80,
+            y_tips = -10*((i%3)+1),
+            y_midpoint = y_tips + 3;      // prong stem
 
         let point_arr =
-            [`${x_left},100`,
-             `${x_left},${y_stct}`,
-             `${x_right},${y_vert}`,
-             `${x_left},${y_stct}`,
-             `${ppml['12px'] * (d.pos+size)},${y_vert}`,
-             `${x_left},${y_stct}`
+            [`${x_mid},${y_needle}`,     // needle
+             `${x_mid},${y_midpoint}`,   // mid-point Y
+             `${x_right},${y_tips}`,     // right-tip Y
+             `${x_right},${y_tips - 4}`, // right-tip Y - Up
+             `${x_right},${y_tips}`,     // right-tip Y
+             `${x_mid},${y_midpoint}`,   // mid-point Y
+             `${x_left},${y_tips}`,      // left-tip Y
+             `${x_left},${y_tips - 4}`,      // left-tip Y - Up
+             `${x_left},${y_tips}`,      // left-tip Y
+             `${x_mid},${y_midpoint}`    // mid-point Y
             ]
         return(point_arr.join(" "))
     }
@@ -185,8 +194,9 @@ function renderSpliceJunctions(splice, offset_x){
         .join(
             enter => enter.append("polyline")
                 .attr("points", makeY)
-                .attr("stroke", "red")
-                .attr("stroke-width", 1)
+                .attr("stroke", "purple")
+                .attr("stroke-width", 1.5)
+                .attr("fill", "none")
                 .attr("transform", "translate(0,-200)")
                 .attr("opacity", 0),
             update => update.transition(t)
@@ -218,22 +228,14 @@ function renderSpliceJunctions(splice, offset_x){
 
 /** Render the transcriptome sequence and center it. Return padding offset to use for
  * spliced exon positioning **/
-function renderTranscriptome(transcriptome){
+function renderTranscriptome(transcriptome, left_off){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
 
-    function calculateLeftOffset(){
-        var spliced_out = transcriptome.splice.map(x => x.size).reduce((x,y) => x + y)
-        return(Math.floor(ppml['12px'] * spliced_out / 2) + off_col)
-    }
-    var left_off = calculateLeftOffset()
     renderSequence("trans",
                    {x:left_off, y:tra_row},
                    transcriptome.seq,
                    "Transcriptome",
                    true)
-
-    renderSpliceJunctions(transcriptome.splice, left_off)
-    return(left_off)
 }
 
 function renderGenome(seq){
@@ -378,13 +380,25 @@ function renderIntrons(exons, grp_name, offset, update_always=false){
 }
 
 
-function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced_exons){
+function calculateLeftOffset(splice){
+    var spliced_out = splice.map(x => x.size).reduce((x,y) => x + y)
+    return(Math.floor(ppml['12px'] * spliced_out / 2) + off_col)
+}
+
+function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced_exons,
+                   answer_key=false){
     renderGenome(seq)
+    if (answer_key){
+        renderPairings(splice);
+    }
     renderDonAcc(pos_donors_accpts);
     renderGenomeExons(exons);
     renderGenomeIntrons(exons);
-    renderPairings(splice);
-    var loff = renderTranscriptome(transcriptome);
-    renderSplicedExons(spliced_exons, loff)
-    renderSplicedIntrons(spliced_exons, loff);
+    var left_off = calculateLeftOffset(transcriptome.splice)
+    renderTranscriptome(transcriptome, left_off);
+    if (answer_key){
+        renderSpliceJunctions(transcriptome.splice, left_off)
+    }
+    renderSplicedExons(spliced_exons, left_off)
+    renderSplicedIntrons(spliced_exons, left_off);
 }
