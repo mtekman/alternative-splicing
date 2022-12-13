@@ -1,10 +1,14 @@
 
+var splkey;
+var refkey;
+
 /** Run once to initialise text boxes updating the SVG on keyup **/
 function initUpdateOnTextboxEdit(){
     var updatebutton = document.getElementById("updatebutton")
 
     function clickUpdate(ev=null){
         updatebutton.click();
+        setURLParams()
         event.preventDefault();
     }
 
@@ -21,41 +25,40 @@ function initUpdateOnTextboxEdit(){
     });
     newViewportSize(numfield.valueAsNumber);
     rerender(numfield.valueAsNumber);
-
 }
 
 function rerender_random(both=false){
     var [new_ref, new_spl] = words(2);
     both = both || document.getElementById("bothkeys").checked
-    document.getElementById("splkey").value = new_spl;
+    splkey.value = new_spl;
     if (both){
-        document.getElementById("refkey").value = new_ref;
+        refkey.value = new_ref;
     } else {
-        new_ref = document.getElementById("refkey").value
+        new_ref = refkey.value
     }
     setURLParams(new_ref, new_spl)
     rerender();
 }
 
 function setURLParams(ref,spl){
+    var ref = ref || refkey.value,
+        spl = spl || splkey.value;
     window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}`)
 }
 
 function getURLParams(){
     var defs = new URLSearchParams(window.location.search)
-    document.getElementById("splkey").value = defs.get("spl")
-    document.getElementById("refkey").value = defs.get("ref")
+    splkey.value = defs.get("spl")
+    refkey.value = defs.get("ref")
 }
 
 function rerender(){
-    console.log("boik")
-    getURLParams()
-    var spl_val = document.getElementById("splkey").value,
-        ref_val = document.getElementById("refkey").value,
+    var spl_val = splkey.value,
+        ref_val = refkey.value,
         gen_len = parseInt(document.getElementById("genkey").value);
 
     if (ref_val === "random"){
-        document.getElementById("splkey").value = spl_val = "random";
+        splkey.value = spl_val = "random";
     }
 
     splrand = setseed(spl_val);
@@ -120,7 +123,18 @@ window.onload = function(){
 
     zoomtoggle(false, document.getElementById("zoom"))
     
+    splkey = document.getElementById("splkey")
+    refkey = document.getElementById("refkey")
+    
     initUpdateOnTextboxEdit()
 
-    window.onpopstate = rerender; // when history changes, update
+    // when history changes, update
+    window.onpopstate = function(){
+        getURLParams();
+        rerender();
+    }
+    // If no keys set, set them.
+    if (document.getElementById("refkey").value === ""){
+        rerender_random()
+    }
 };
