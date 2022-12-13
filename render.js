@@ -329,7 +329,16 @@ function renderSplicedExons(spliced_exons, transcript_offset){
     renderExons(spliced_exons, "transcript-exons", {x:transcript_offset,y:esp_row}, true)
 }
 
-function renderIntrons(exons, transcript_offset){
+function renderGenomeIntrons(exons){
+    renderIntrons(exons, "genome-introns", {x:off_col, y:exn_row}, update_always=false)
+}
+
+// If any!
+function renderSplicedIntrons(exons, loff){
+    renderIntrons(exons, "transcript-introns", {x:loff, y:esp_row}, update_always=true)
+}
+
+function renderIntrons(exons, grp_name, offset, update_always=false){
     // Determine Intron positions
     var introns = exons
         .filter(x => x.len > 0)
@@ -341,10 +350,12 @@ function renderIntrons(exons, transcript_offset){
         }, [])
         .filter(x => (x[1] - x[0] > 0))
         .map(x => {return({beg:x[0], end:x[1], len:x[1] - x[0]})})
-    console.log(introns)
+    //console.log(introns)
 
-    let int_group = primeGroup("intron", {x:transcript_offset,
-                                          y:exn_row + (exon_height/2) - (intron_height/2)})
+    let int_offset = offset;
+    int_offset.y = int_offset.y + (exon_height/2) - (intron_height/2);
+
+    let int_group = primeGroup(grp_name, int_offset, update_always)
     let blocks = int_group.selectAll("rect");
     
     blocks = blocks.data(introns, (d,i) => i)
@@ -363,9 +374,7 @@ function renderIntrons(exons, transcript_offset){
         ).call(blocks => blocks.transition(t)
                .attr("height", intron_height)
                .attr("width", d => ppml['12px'] * d.len)
-               .attr("x", d => ppml['12px'] * d.beg));
-    
-    
+               .attr("x", d => ppml['12px'] * d.beg));    
 }
 
 
@@ -373,9 +382,9 @@ function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced
     renderGenome(seq)
     renderDonAcc(pos_donors_accpts);
     renderGenomeExons(exons);
-    renderIntrons(exons, off_col);
+    renderGenomeIntrons(exons);
     renderPairings(splice);
     var loff = renderTranscriptome(transcriptome);
     renderSplicedExons(spliced_exons, loff)
-    //renderIntrons(spliced_exons, loff);
+    renderSplicedIntrons(spliced_exons, loff);
 }
