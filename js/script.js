@@ -12,7 +12,9 @@ function initialiseInputs(){
     randombutton.onclick = rerender_random
 
     var zoomkey = document.getElementById("zoomkey")
-    zoomkey.onclick=function(){zoomtoggle(this.checked, this.parentNode);}
+    zoomkey.onclick = function(){
+        zoomtoggle(this.checked, this.parentNode);
+    }
 
     function clickUpdate(ev=null){
         updatebutton.click();
@@ -50,7 +52,7 @@ function rerender_random(){
 }
 
 /** Called by rerender_random before calling rerender **/
-function setURLParams(ref, spl, ans){
+function setURLParams(ref, spl){
     var ref = ref || refkey.value,
         spl = spl || splkey.value
     window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}`)
@@ -61,7 +63,12 @@ function getURLParams(){
     var defs = new URLSearchParams(window.location.search)
     splkey.value = defs.get("spl")
     refkey.value = defs.get("ref")
-    anskey.value = rand.akey[0](refkey.value, splkey.value)
+    if ((wordList.indexOf(splkey.value)=== -1) ||
+        (wordList.indexOf(refkey.value)=== -1)){
+        anskey.value = "None Given"
+    } else {
+        anskey.value = rand.akey(refkey.value, splkey.value)
+    }
 }
 
 function rerender(){
@@ -147,6 +154,7 @@ window.onload = function(){
     // when history changes, update
     window.onpopstate = function(){
         getURLParams();
+        //setURLParams();
         rerender();
     }
     // If no keys set, set them.

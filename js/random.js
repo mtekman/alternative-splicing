@@ -65,16 +65,15 @@ var rand = {
         return(i)
     },
 
-    // It does what you think it does.
-    akey: {
-
-        0 : function(ref,spl){
-            ref = ref || refkey.value
-            spl = spl || splkey.value
-            return(wordList[[ref, spl]
-                            .reduce((acc,val) => acc * rand._nearestIndex(wordList, val), 1)
-                            % wordList.length])
-        }
+    // Returns the answer key for a given ref and spl
+    akey: function(ref,spl){
+        ref = ref || refkey.value
+        spl = spl || splkey.value
+        var lenwords = ref.length + spl.length
+        return(wordList[
+            ([ref, spl].reduce(
+                (acc,val) => acc * rand._nearestIndex(wordList, val), 1
+            ) + lenwords) % wordList.length])
     }
 }
 

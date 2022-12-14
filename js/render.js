@@ -17,11 +17,11 @@ const exon_height = 30,
 
 /** Determine the new SVG viewport size based on the genome length **/
 function newViewportSize(genome_length){
-    var width = (off_col + genome_length) * ppml['12px']
-    if (width < 400){
-        width = 400
-    }
-    svg.attr('viewBox', `0 0 ${width} 300`)
+    var width = (off_col + genome_length) * ppml['12px'],
+        height = genome_length * 2
+    if (width < 400){width = 400}
+    if (height < 300){height = 300}
+    svg.attr('viewBox', `0 0 ${width} ${height}`)
 }
 
 function renderGenomeExons(exons){
@@ -42,7 +42,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
     // Exons with a non-zero sequence length. We still feed the blocks the original data
     // to preserve the colouring though.
     var filter_exons = exons.filter(d => d.len > 0)
-    
+
     blocks = blocks.data(exons, d => d.name)
         .join(
             enter => enter.append("rect")
@@ -193,7 +193,7 @@ function renderSpliceJunctions(splice, offset_x){
     }
 
     splice = splice.filter(x => x.seq !== null)
-    
+
     poly = poly.data(splice, (d,i) => i)
         .join(
             enter => enter.append("polyline")
@@ -363,7 +363,7 @@ function renderIntrons(exons, grp_name, offset, update_always=false){
 
     let int_group = primeGroup(grp_name, int_offset, update_always)
     let blocks = int_group.selectAll("rect");
-    
+
     blocks = blocks.data(introns, (d,i) => i)
         .join(
             enter => enter.append("rect")
@@ -380,7 +380,7 @@ function renderIntrons(exons, grp_name, offset, update_always=false){
         ).call(blocks => blocks.transition(t)
                .attr("height", intron_height)
                .attr("width", d => ppml['12px'] * d.len)
-               .attr("x", d => ppml['12px'] * d.beg));    
+               .attr("x", d => ppml['12px'] * d.beg));
 }
 
 
@@ -391,21 +391,25 @@ function calculateLeftOffset(splice){
 
 function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced_exons,
                    ans)
-{    
+{
     var left_off = calculateLeftOffset(transcriptome.splice)
-    const show = ans !== rand.akey[0]()
-    if (show){
+
+    const dontshow = ans !== rand.akey()
+    if (dontshow){
         splice = [{don:null, acc:null, name: null}]
         transcriptome.splice = [{pos:null, seq:null, size:null}]
     }
-    ansdiv.style.display = show?"flex":"none";
+    ansdiv.style.display = dontshow?"flex":"none";
+
     renderGenome(seq)
     renderPairings(splice);
     renderDonAcc(pos_donors_accpts);
     renderGenomeExons(exons);
     renderGenomeIntrons(exons);
-    renderTranscriptome(transcriptome, left_off);
-    renderSpliceJunctions(transcriptome.splice, left_off)
-    renderSplicedExons(spliced_exons, left_off)
-    renderSplicedIntrons(spliced_exons, left_off);
+    if (transcriptome !== null){
+        renderTranscriptome(transcriptome, left_off);
+        renderSpliceJunctions(transcriptome.splice, left_off)
+        renderSplicedExons(spliced_exons, left_off)
+        renderSplicedIntrons(spliced_exons, left_off);
+    }
 }
