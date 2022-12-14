@@ -27,7 +27,4 @@ cat index.html | grep -vP "(<script src=|<link rel=\"stylesheet\")" > $pub_html
 sed -i "/\/head/e cat $tmp_css" $pub_html
 sed -i "/External Libraries/e cat $tmp_js" $pub_html
 
-## Copy over favicon info
-cp favicons/* $pub_dir
-
 rm -rf $tmp_dir
