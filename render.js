@@ -127,6 +127,8 @@ function renderPairings(pairings){
         return(point_arr.join(" "))
     }
 
+    pairings = pairings.filter(x => x.don !== null)
+
     blocks = blocks.data(pairings, (d,i) => i)
         .join(
             enter => enter.append("polyline")
@@ -190,6 +192,8 @@ function renderSpliceJunctions(splice, offset_x){
         return(-10*((i%3)+1)) // prong
     }
 
+    splice = splice.filter(x => x.seq !== null)
+    
     poly = poly.data(splice, (d,i) => i)
         .join(
             enter => enter.append("polyline")
@@ -386,19 +390,22 @@ function calculateLeftOffset(splice){
 }
 
 function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced_exons,
-                   answer_key=false){
-    renderGenome(seq)
-    if (answer_key){
-        renderPairings(splice);
+                   ans)
+{    
+    var left_off = calculateLeftOffset(transcriptome.splice)
+    const show = ans !== rand.akey[0]()
+    if (show){
+        splice = [{don:null, acc:null, name: null}]
+        transcriptome.splice = [{pos:null, seq:null, size:null}]
     }
+    ansdiv.style.display = show?"flex":"none";
+    renderGenome(seq)
+    renderPairings(splice);
     renderDonAcc(pos_donors_accpts);
     renderGenomeExons(exons);
     renderGenomeIntrons(exons);
-    var left_off = calculateLeftOffset(transcriptome.splice)
     renderTranscriptome(transcriptome, left_off);
-    if (answer_key){
-        renderSpliceJunctions(transcriptome.splice, left_off)
-    }
+    renderSpliceJunctions(transcriptome.splice, left_off)
     renderSplicedExons(spliced_exons, left_off)
     renderSplicedIntrons(spliced_exons, left_off);
 }

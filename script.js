@@ -1,6 +1,7 @@
-
 var splkey;
 var refkey;
+var anskey;
+var ansdiv;
 
 /** Run once to initialise text boxes updating the SVG on keyup **/
 function initUpdateOnTextboxEdit(){
@@ -24,45 +25,51 @@ function initUpdateOnTextboxEdit(){
         rerender(gen_len);
     });
     newViewportSize(numfield.valueAsNumber);
-    rerender(numfield.valueAsNumber);
+    rerender();
 }
 
 function rerender_random(both=false){
-    var [new_ref, new_spl] = words(2);
+    var [new_ref, new_spl] = words(2)
     both = both || document.getElementById("bothkeys").checked
     splkey.value = new_spl;
     if (both){
         refkey.value = new_ref;
     } else {
-        new_ref = refkey.value
+        new_ref = refkey.value;
     }
-    setURLParams(new_ref, new_spl)
+    setURLParams(new_ref, new_spl, rand.akey[0](new_ref, new_spl))
+    getURLParams()
     rerender();
 }
 
-function setURLParams(ref,spl){
+/** Called by rerender_random before calling rerender **/
+function setURLParams(ref, spl, ans){
     var ref = ref || refkey.value,
-        spl = spl || splkey.value;
-    window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}`)
+        spl = spl || splkey.value,
+        ans = ans || anskey.value
+    window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}&ans=${ans}`)
 }
 
+/** Called on page load **/
 function getURLParams(){
     var defs = new URLSearchParams(window.location.search)
     splkey.value = defs.get("spl")
     refkey.value = defs.get("ref")
+    anskey.value = defs.get("ans")    
 }
 
 function rerender(){
     var spl_val = splkey.value,
         ref_val = refkey.value,
-        gen_len = parseInt(document.getElementById("genkey").value);
+        ans_key = anskey.value,
+        gen_len = parseInt(document.getElementById("genkey").value)
 
     if (ref_val === "random"){
         splkey.value = spl_val = "random";
     }
 
-    splrand = setseed(spl_val);
-    refrand = setseed(ref_val);
+    splrand = rand.setseed(spl_val);
+    refrand = rand.setseed(ref_val);
 
     var clean_ref = generateCleanRef(gen_len),
         exon_pos = generatePrecursorExons(clean_ref),
@@ -83,7 +90,7 @@ function rerender(){
         //console.log(exons, exons_spliced)
     }
     renderAll(genome, transcriptome, exons,
-              splice_pos, splice, exons_spliced);
+              splice_pos, splice, exons_spliced, ans_key);
 }
 
 function zoomtoggle(enable, parentNode){
@@ -125,7 +132,10 @@ window.onload = function(){
     
     splkey = document.getElementById("splkey")
     refkey = document.getElementById("refkey")
-    
+    anskey = document.getElementById("anskey")
+    ansdiv = document.getElementById("answer")
+
+    getURLParams()
     initUpdateOnTextboxEdit()
 
     // when history changes, update
@@ -136,5 +146,5 @@ window.onload = function(){
     // If no keys set, set them.
     if (document.getElementById("refkey").value === ""){
         rerender_random()
-    }
+    }    
 };

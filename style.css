@@ -17,6 +17,10 @@ body {
 
 }
 
+#answer {
+    display: none;
+}
+
 #maincircle {
   border: solid black;
   border-radius: 20px;
