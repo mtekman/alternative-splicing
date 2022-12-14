@@ -1,209 +1,231 @@
 body {
-    background-image:
-        linear-gradient(76deg,
-            #eee 16.67%,
-            #ddd 16.67%, #fff 33.33%, #fff 33.33%,
-            #fff 50%, #eee 50%, #eee 66.67%,
-            #ddd 66.67%, #fff 83.33%, #fff 83.33%, #fff 100%);
-    background-size: 61.84px 248.01px;
+ background-image:linear-gradient(76deg,#eee 16.67%,#ddd 16.67%,#fff 33.33%,#fff 33.33%,#fff 50%,#eee 50%,#eee 66.67%,#ddd 66.67%,#fff 83.33%,#fff 83.33%,#fff 100%);
+ background-size:61.84px 248.01px
 }
+
+@screen {
+  svg text.labels {
+    font-size: 1.2vmax;
+    font-weight: bold;
+  }
+  svg text.pairings {
+    font-size: 1.5vmin;
+    font-weight: bold;
+  }
+}
+@media {
+  svg text.labels {
+    font-size: 2vmax;
+    font-weight: bold;
+  }
+  svg text.pairings {
+    font-size: 1.5vmin;
+    font-weight: bold;
+  }
+}
+
 
 #wholeapp {
-  position:absolute;
-  width:90%;
-  height:500px;
-  margin-top: 1em;
-  margin-left: 3%
-
+ position:absolute;
+ width:90%;
+ height:500px;
+ margin-top:1em;
+ margin-left:3%
 }
-
 #zoom {
-  display: flex;
-  flex-direction: row;
-  opacity: 15%;
-  padding: -0.4em;
+ display:flex;
+ flex-direction:row;
+ opacity:15%;
+ padding:-0.4em
 }
-
 #answer {
-  display: none;
+ display:none
 }
-
 #maincircle {
-  border: solid black;
-  border-radius: 20px;
-  text-align: center;
-  background-color: #cdc;
-  box-shadow: 5px 5px 5px #888;
+ border:solid black;
+ border-radius:20px;
+ text-align:center;
+ background-color:#cdc;
+ box-shadow:5px 5px 5px #888
 }
-
 #svg-div {
-  position: relative;  
+ position:relative
 }
-
 #svg-div svg {
-    width: 100%;
-    height: auto;
+ width:100%;
+ height:auto
 }
-
 #maincircle ul {
-  list-style-type: none;
-  padding: 0px;
-  margin: 0px;
+ list-style-type:none;
+ padding:0px;
+ margin:0px
 }
-
-/** Keeps title top-aligned **/
 #maincircle li.smallspace {
-  margin: -2% 0px 0px 0px;
+ margin:-2% 0px 0px 0px
 }
-
 #maincircle h2 {
-  font-family: 'Ubuntu Mono', monospace;
-  font-style: italic;
-  font-size: 0.6em;
+ font-family:'Ubuntu Mono',monospace;
+ font-style:italic;
+ font-size:0.6em
 }
-
-/** Keeps subtitle aligned **/
 #maincircle h2.smallspace {
-  margin-top: -4em;
-  background-color: black;
-  color:white;
+ margin-top:-4em;
+ background-color:black;
+ color:white
 }
-
 #maincircle h1 {
-  font-family: 'Ubuntu', sans-serif;
-  font-size: 2.5em;
-  background-color:#eee;
-  border: 3px solid black;
-  border-radius: 19px 19px 0px 0px;
-  margin-top: 1%;
-  border-left: 0px;
-  border-right: 0px;
-  border-bottom: 0px;
+ font-family:'Ubuntu',sans-serif;
+ font-size:2.5em;
+ background-color:#eee;
+ border:3px solid black;
+ border-radius:19px 19px 0px 0px;
+ margin-top:1%;
+ border-left:0px;
+ border-right:0px;
+ border-bottom:0px
 }
-
 .toplevel {
-    display:flex;
-    max-width: 900px;
-    padding: 0.1em;
-  justify-content: center;
-    align-content: center;
-    margin-left: auto;
-    margin-right: auto;
+ display:flex;
+ max-width:900px;
+ padding:0.1em;
+ justify-content:center;
+ align-content:center;
+ margin-left:auto;
+ margin-right:auto
 }
-
 .title {
-  font-family: 'Ubuntu', sans-serif;
-  font-size: 3em;
-  background-color:#eee;
-  border: 3px solid black;
-  border-radius: 19px 19px 0px 0px;
-  margin-top: 1%;
-  border-left: 0px;
-  border-right: 0px;
-  border-bottom: 0px;
+ font-family:'Ubuntu',sans-serif;
+ font-size:3em;
+ background-color:#eee;
+ border:3px solid black;
+ border-radius:19px 19px 0px 0px;
+ margin-top:1%;
+ border-left:0px;
+ border-right:0px;
+ border-bottom:0px
 }
-
 .container {
-  display: flex;
-  margin-top: -0.5em;
-  margin-left: auto;
-  margin-right: auto;
+ display:flex;
+ margin-top:-0.5em;
+ margin-left:auto;
+ margin-right:auto
 }
-
 .shadowdrop {
-  filter: drop-shadow(2px 2px 5px #444);
+ filter:drop-shadow(2px 2px 5px #444)
 }
-
 .boxfill {
-  max-width: 10%;
-  width: 3em;
+ max-width:10%;
+ width:3em
 }
-
 .box {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  margin: 0.2em;
+ display:flex;
+ flex-direction:column;
+ align-items:stretch;
+ margin:0.2em
 }
-
 .box label {
-  font-size: 2.5vmin;
-  text-align: center;
-  font-weight: bold;
+ font-size:1.5vmax;
+ text-align:center;
+ font-weight:bold
+}
+.box input {
+ font-size:0.7em
+}
+.boxcheck {
+ flex-direction:row
+}
+@media (max-width:699px) {
+ .container {
+  display:grid;
+  grid-template-rows:2em 2em;
+  grid-template-columns:30% 30% 30%
+ }
+ .boxcheck {
+  flex-direction:row
+ }
 }
 
-/** Always have this size for inputs **/
-.box input {font-size: 0.7em;}
-.boxcheck {flex-direction: row;}
-
-@media (max-width: 699px){
-  .container {
-    display: grid;
-    grid-template-rows: 2em 2em;
-    grid-template-columns: 30% 30% 30%;
-  }
-  .boxcheck {flex-direction: row;}
+@media (min-width:0px) and (max-width:705px) { 
+ .box label {
+  font-size:0.5em
+ }
+ #maincircle h1 {
+  font-size:1em
+ }
+ #maincircle h2.smallspace {
+  margin-top:-1.5em
+ }
+}
+@media (max-aspect-ratio:5/8) {
+ .container {
+   flex-direction:column;
+   width:95%
+ }
 }
 
-@media (min-width: 0px) and (max-width: 699px) {
-  .box label {font-size: 0.5em;}
-  #maincircle h1 {font-size: 1em;}
-  #maincircle h2.smallspace {margin-top: -1.5em}
+@media 
+  (min-width:700px) and 
+  (max-aspect-ratio: 5/8) {
+ 
+ .boxcheck {
+    flex-direction:row;
+ }
+ .box {
+    flex-direction: row;
+ }
+ .box input[type="button"] {
+   width: 10%;
+ }
+ .box input {
+   font-size: 1.2em;
+ }
+ .box label {
+  font-size:1em;
+ }
 }
-
-@media (max-aspect-ratio: 5/8) {
-  .container {flex-direction: column; width: 95%;}
+@media (min-width:1001px) {
+ .box label {
+  font-size:0.8em
+ }
 }
-
-@media (min-width: 700px){
-  .boxcheck {flex-direction: column;}
-  .box label {font-size: 1vmax;}
-}
-
-@media (min-width: 1001px) {
-  .box label {font-size: 0.8em;}
-}
-
-
 .box input[type="checkbox"] {
-  vertical-align: middle;
+ vertical-align:middle
 }
-
-.box input[type="text"],input[type="number"] {
-  text-align: center;
-  width: 90%;
-  border-radius: 10px;
-  border: 2px solid #555;
-  display: grid;
+.box input[type="text"],
+input[type="number"] {
+ text-align:center;
+ width:90%;
+ border-radius:10px;
+ border:2px solid #555;
+ display:grid;
+ font-size: 2vmax;
 }
-
 .box input[type="button"] {
-  margin: 3px;
-  width: 100%;
-  height: 100%;
+ margin: 3px;
+ width: 90%;
+ height: 90%;
+ font-size: 1.6vmax;
 }
-
-
 #signature {
-  position: fixed;
-  display: inline-block;
-  position: fixed;
-  bottom: 5px;
-  right: 2px;
-  padding: 0px 2px 0px 2px;
-  background: #f0f0f0;
-  color: #1c1b1b;
-  font-size: 0.6em;
-  border-radius: 10px;
+ position:fixed;
+ display:inline-block;
+ position:fixed;
+ bottom:5px;
+ right:2px;
+ padding:0px 2px 0px 2px;
+ background:#f0f0f0;
+ color:#1c1b1b;
+ font-size: 2.5vmin;
+ border-radius: 10px;
 }
 #signature:hover {
- background: #5555ff; 
- color: white;
+ background:#5555ff;
+ color:white
 }
 #signature a {
-  text-decoration: none;
-  color: #1c1b1b
+ text-decoration:none;
+ color:#1c1b1b
 }
 #signature a:hover {
-  color: white;
+ color:white
 }

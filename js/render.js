@@ -147,6 +147,7 @@ function renderPairings(pairings){
                 .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1.5))
                 .attr("y", -20)
                 .style("font-family", "monospace")
+                .attr("class", "pairings")
                 .text(""),
             update => update.transition(t)
                 .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1.5))
