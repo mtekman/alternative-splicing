@@ -2,7 +2,7 @@
 
 ## pacman -S uglify-js python-rcssmin
 
-pub_dir="public"
+pub_dir="deploy"
 pub_html="$pub_dir/index.html"
 
 tmp_dir="_temp_"
