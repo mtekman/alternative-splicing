@@ -22,6 +22,8 @@ function newViewportSize(genome_length){
     if (width < 400){width = 400}
     if (height < 300){height = 300}
     svg.attr('viewBox', `0 0 ${width} ${height}`)
+    svg_div.style.width = Math.floor(window.innerWidth * 0.8) + "px"
+    svg_div.style.height = Math.floor(window.innerHeight * 0.8) + "px"
 }
 
 function renderGenomeExons(exons){

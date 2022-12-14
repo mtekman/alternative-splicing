@@ -1,5 +1,6 @@
 const VERSION=0.6
 
+var svg_div;
 var splkey;
 var refkey;
 var anskey;
@@ -112,7 +113,7 @@ function zoomtoggle(enable, parentNode){
     const zoom = d3.zoom().on('zoom', e => {
         svg_group.attr("transform", (transform = e.transform));
     });
-    const svg_div = document.getElementById("svg-div")
+    svg_div = document.getElementById("svg-div")
 
     function hoverOn(node){node.style.opacity="0.5"}
     function hoverOff(node){node.style.opacity="1"}
@@ -142,6 +143,7 @@ window.onload = function(){
     document.getElementById("version").innerHTML = "(v" + VERSION + ")"
 
     svg = d3.select("#svg-div").append("svg")
+        .attr("preserveAspectRatio", "xMinYMin meet")
     // all groups are contained within a single parent group
     svg_group = svg.append("g")
 
@@ -161,6 +163,11 @@ window.onload = function(){
         //setURLParams();
         rerender();
     }
+
+    window.onresize = function(){
+        newViewportSize(document.getElementById('genkey').valueAsNumber);
+    }
+    
     // If no keys set, set them.
     if (document.getElementById("refkey").value === ""){
         rerender_random()
