@@ -37,7 +37,7 @@ function rerender_random(both=false){
     } else {
         new_ref = refkey.value;
     }
-    setURLParams(new_ref, new_spl, rand.akey[0](new_ref, new_spl))
+    setURLParams(new_ref, new_spl)
     getURLParams()
     rerender();
 }
@@ -45,9 +45,8 @@ function rerender_random(both=false){
 /** Called by rerender_random before calling rerender **/
 function setURLParams(ref, spl, ans){
     var ref = ref || refkey.value,
-        spl = spl || splkey.value,
-        ans = ans || anskey.value
-    window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}&ans=${ans}`)
+        spl = spl || splkey.value
+    window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}`)
 }
 
 /** Called on page load **/
@@ -55,7 +54,7 @@ function getURLParams(){
     var defs = new URLSearchParams(window.location.search)
     splkey.value = defs.get("spl")
     refkey.value = defs.get("ref")
-    anskey.value = defs.get("ans")    
+    anskey.value = rand.akey[0](refkey.value, splkey.value)
 }
 
 function rerender(){
@@ -101,7 +100,7 @@ function zoomtoggle(enable, parentNode){
 
     function hoverOn(node){node.style.opacity="0.5"}
     function hoverOff(node){node.style.opacity="1"}
-    
+
     if (enable) {
         svg.call(zoom)
         svg.style.border = ""
@@ -129,7 +128,7 @@ window.onload = function(){
     svg_group = svg.append("g")
 
     zoomtoggle(false, document.getElementById("zoom"))
-    
+
     splkey = document.getElementById("splkey")
     refkey = document.getElementById("refkey")
     anskey = document.getElementById("anskey")
@@ -146,5 +145,5 @@ window.onload = function(){
     // If no keys set, set them.
     if (document.getElementById("refkey").value === ""){
         rerender_random()
-    }    
+    }
 };

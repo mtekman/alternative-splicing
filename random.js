@@ -48,6 +48,7 @@ var rand = {
 
     // Get nearest index of a string
     _nearestIndex: function (arr, query){
+        if (query.length === 0){return -1}
         var match = arr.indexOf(query)
         if (match !== -1){
             return match
@@ -64,6 +65,7 @@ var rand = {
         return(i)
     },
 
+    // It does what you think it does.
     akey: {
 
         0 : function(ref,spl){
