@@ -3,27 +3,14 @@ body {
  background-size:61.84px 248.01px
 }
 
-@screen {
-  svg text.labels {
-    font-size: 1.2vmax;
-    font-weight: bold;
-  }
-  svg text.pairings {
-    font-size: 1.5vmin;
-    font-weight: bold;
-  }
+svg text.labels {
+   font-size: 1.4em;
+   font-weight: bold;
 }
-@media {
-  svg text.labels {
-    font-size: 2vmax;
-    font-weight: bold;
-  }
-  svg text.pairings {
-    font-size: 1.5vmin;
-    font-weight: bold;
-  }
+svg text.pairings {
+   font-size: 1.4em;
+   font-weight: bold;
 }
-
 
 #wholeapp {
  position:absolute;
@@ -163,26 +150,6 @@ body {
  }
 }
 
-@media 
-  (min-width:700px) and 
-  (max-aspect-ratio: 5/8) {
- 
- .boxcheck {
-    flex-direction:row;
- }
- .box {
-    flex-direction: row;
- }
- .box input[type="button"] {
-   width: 10%;
- }
- .box input {
-   font-size: 1.2em;
- }
- .box label {
-  font-size:1em;
- }
-}
 @media (min-width:1001px) {
  .box label {
   font-size:0.8em
