@@ -17,8 +17,15 @@ body {
 
 }
 
+#zoom {
+  display: flex;
+  flex-direction: row;
+  opacity: 15%;
+  padding: -0.4em;
+}
+
 #answer {
-    display: none;
+  display: none;
 }
 
 #maincircle {
@@ -31,7 +38,6 @@ body {
 
 #svg-div {
   position: relative;  
-  overflow: scroll;
 }
 
 #svg-div svg {
@@ -161,13 +167,6 @@ body {
 
 .box input[type="checkbox"] {
   vertical-align: middle;
-}
-
-#zoom {
-  display: flex;
-  flex-direction: row;
-  opacity: 10%;
-  padding: 0.4em;
 }
 
 .box input[type="text"],input[type="number"] {

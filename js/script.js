@@ -1,3 +1,5 @@
+const VERSION=0.6
+
 var splkey;
 var refkey;
 var anskey;
@@ -137,6 +139,8 @@ function zoomtoggle(enable, parentNode){
 
 
 window.onload = function(){
+    document.getElementById("version").innerHTML = "(v" + VERSION + ")"
+
     svg = d3.select("#svg-div").append("svg")
     // all groups are contained within a single parent group
     svg_group = svg.append("g")
