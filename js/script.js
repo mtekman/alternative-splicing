@@ -35,9 +35,9 @@ function initialiseInputs(){
     rerender();
 }
 
-function rerender_random(both=false){
+function rerender_random(){
     var [new_ref, new_spl] = words(2)
-    both = both || document.getElementById("bothkeys").checked
+    var both = document.getElementById("bothkeys").checked
     splkey.value = new_spl;
     if (both){
         refkey.value = new_ref;
