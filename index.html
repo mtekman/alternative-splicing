@@ -41,20 +41,20 @@
                 <input id="splkey" type="text" value="two" />
               </div>
               <div class="box boxcheck" >
-                <input type="button" value="Random" onclick="rerender_random()" />
+                <input type="button" value="Random" id="randombutton" />
                 <label for="bothkeys">
                   <input type="checkbox" id="bothkeys" checked="true" />Both?
                 </label>
               </div>
               <div class="box" >
-                <input type="button" id="updatebutton" value="Update" onclick="rerender()" />
+                <input type="button" id="updatebutton" value="Update" />
               </div>
             </div>
           </li>
         </ul>
       </div>
       <div id="zoom" >
-        <p>&#128270</p><input type="checkbox" id="zoomkey" onclick="zoomtoggle(this.checked, this.parentNode)" />
+        <p>&#128270</p><input type="checkbox" id="zoomkey" />
         <div class="box" id="answer" >
           <label for="anskey">Answer Key</label>
           <input id="anskey" type="text" value="three" />

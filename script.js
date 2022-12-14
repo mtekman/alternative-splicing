@@ -4,8 +4,15 @@ var anskey;
 var ansdiv;
 
 /** Run once to initialise text boxes updating the SVG on keyup **/
-function initUpdateOnTextboxEdit(){
+function initialiseInputs(){
     var updatebutton = document.getElementById("updatebutton")
+    updatebutton.onclick = rerender;
+
+    var randombutton = document.getElementById("randombutton")
+    randombutton.onclick = rerender_random
+
+    var zoomkey = document.getElementById("zoomkey")
+    zoomkey.onclick=function(){zoomtoggle(this.checked, this.parentNode);}
 
     function clickUpdate(ev=null){
         updatebutton.click();
@@ -135,7 +142,7 @@ window.onload = function(){
     ansdiv = document.getElementById("answer")
 
     getURLParams()
-    initUpdateOnTextboxEdit()
+    initialiseInputs()
 
     // when history changes, update
     window.onpopstate = function(){
