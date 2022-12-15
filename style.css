@@ -4,11 +4,11 @@ body {
 }
 
 svg text.labels {
-   font-size: 1.4em;
+   font-size: max(1em,1.2vmin);
    font-weight: bold;
 }
 svg text.pairings {
-   font-size: 1.4em;
+   font-size: unset;
    font-weight: bold;
 }
 
@@ -25,7 +25,7 @@ svg text.pairings {
  flex-direction:row;
  opacity:15%;
  padding:-0.4em;
- font-size: 2.5vw;
+ font-size: 1em;
  margin:-0.4em;
 }
 
@@ -184,7 +184,7 @@ svg text.pairings {
  margin: 3px;
  width: 90%;
  height: 90%;
- font-size: 1.6vmax;
+ font-size: min(1em, 1.6vmin);
 }
 
 #signature {
@@ -196,7 +196,7 @@ svg text.pairings {
  padding:2px 2px 2px 2px;
  background:#f0f0f0;
  color:#1c1b1b;
- font-size: max(2.5vmin, 1.02em);
+ font-size: min(2vmax,1em);
  border-radius: 10px;
 }
 #signature:hover {
