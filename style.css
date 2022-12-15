@@ -19,13 +19,16 @@ svg text.pairings {
  margin-top:1em;
  margin-left:3%
 }
+
 #zoom {
  display:flex;
  flex-direction:row;
  opacity:15%;
  padding:-0.4em;
  font-size: 2.5vw;
+ margin:-0.4em;
 }
+
 #answer {
  display:none
 }
@@ -153,38 +156,47 @@ svg text.pairings {
 }
 
 @media (min-width:1001px) {
- .box label {
-  font-size:0.8em
- }
+  svg text.labels {font-size:1.2em; font-weight: unset;}
+  .box label {font-size:1em;}
+  .box input[type="text"],input[type="number"]{
+    font-size:1em;
+  }
 }
+
 .box input[type="checkbox"] {
  vertical-align:middle
 }
-.box input[type="text"],
-input[type="number"] {
+
+.box input[type="text"],input[type="number"] {
  text-align:center;
  width:90%;
  border-radius:10px;
  border:2px solid #555;
  display:grid;
- font-size: 2vmax;
 }
+@media (max-width:1000px){
+ .box input[type="text"],input[type="number"] {
+   font-size: 2vmax;
+ }
+}
+  
 .box input[type="button"] {
  margin: 3px;
  width: 90%;
  height: 90%;
  font-size: 1.6vmax;
 }
+
 #signature {
  position:fixed;
  display:inline-block;
  position:fixed;
  bottom:5px;
  right:2px;
- padding:0px 2px 0px 2px;
+ padding:2px 2px 2px 2px;
  background:#f0f0f0;
  color:#1c1b1b;
- font-size: 2.5vmin;
+ font-size: max(2.5vmin, 1.02em);
  border-radius: 10px;
 }
 #signature:hover {
