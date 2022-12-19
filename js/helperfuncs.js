@@ -68,7 +68,7 @@ function makeSplicePairings(all_possible_pairs, min_dist=5)
 
 /** Generate an acceptable number of non-overlapping Donor-Acceptor splice sites, and give
  * them unique names. **/
-function makeValidSplicePairings(all_possible_pairs, min=2, max=5){
+function makeValidSplicePairings(all_possible_pairs, named_sites, min=2, max=5){
     var max_loops = 1000
     var num_pairings = 0
     var spees;
@@ -76,10 +76,29 @@ function makeValidSplicePairings(all_possible_pairs, min=2, max=5){
         spees = makeSplicePairings(all_possible_pairs)
         num_pairings = spees.length;
     }
-    spees.map(x=> x.name = x.don + "-" + (x.acc+2))
-    //console.log("Found after: ", 1001-max_loops, " loops")
+    // Give names to the junctions (donor location, and site names)
+    for (var i=0; i < spees.length; i++){
+        let sj = spees[i];
+        sj.name = sj.don + "-" + (sj.acc+2)
+        let dname = named_sites.filter(x => x.val === sj.don),
+            aname = named_sites.filter(x => x.val === sj.acc);
+
+        if ((dname.length !== 1) || (aname.length !==1)){
+            console.log("Ambiguous names:", sj)
+        }
+        sj.sites = dname[0].name + "-" + aname[0].name
+    }    
     return(spees)
 }
+
+function nameSites(donors, acceptors){
+    // Highlight Donors and Acceptors
+    let don_acc = donors.map((x,i) => {return({val:x, name: "D"+i, fill: "red" })})
+    let acc_arr = acceptors.map((x,i) => {return({val:x, name: "A"+i, fill: "blue" })});
+    don_acc.push.apply(don_acc, acc_arr);
+    return(don_acc)
+}
+
 
 /** Check if a D3 group is empty, if so add it. **/
 function primeGroup(name, trans_offsets, update_always=false){

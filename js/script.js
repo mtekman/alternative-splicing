@@ -1,4 +1,4 @@
-const VERSION=0.6
+const VERSION=0.9
 
 var svg_div;
 var splkey;
@@ -93,20 +93,25 @@ function rerender(){
         genome = genome_info.new_ref,
         splice_pos = genome_info.don_acc,
         exons = generateExons(genome, exon_pos)
-    //var pos_donors_accpts = {dons: tmp.don, accs: tmp.acc};
-
-    var all_possible_pairs = prepareCartesian(splice_pos.don, splice_pos.acc);
-    var splice = makeValidSplicePairings(all_possible_pairs);
-
+    
+    var splice_sites = nameSites(splice_pos.don, splice_pos.acc)
+    var splice_junctions = makeValidSplicePairings(
+        prepareCartesian(splice_pos.don,splice_pos.acc),
+        splice_sites
+    );
+    
     var transcriptome = null,
-        exons_spliced = null;
-    if (splice.length > 0){
-        transcriptome = determineTranscriptome(genome, splice);
-        exons_spliced = determineSplicedExons(exons, splice)
-        //console.log(exons, exons_spliced)
+        exons_spliced = null,
+        verdicts = null;
+    if (splice_junctions.length > 0){
+        transcriptome = determineTranscriptome(genome, splice_junctions);
+        splice_info = determineSplicedExons(exons, splice_junctions)
+        exons_spliced = splice_info.spliced_exons
+        verdicts = splice_info.verdicts
     }
     renderAll(genome, transcriptome, exons,
-              splice_pos, splice, exons_spliced, ans_key);
+              splice_sites, splice_junctions, exons_spliced, verdicts,
+              ans_key);
 }
 
 function zoomtoggle(enable, parentNode){

@@ -5,12 +5,13 @@ var t; // transition elem
  // pixels per monospace letter
 const ppml = {'12px' : 7.21,
               '8px' : 4.8}
-const off_col = 10,
-      spl_row = 30,
-      ref_row = 46,
-      exn_row = 90,
-      tra_row = 200,
-      esp_row = 240;
+const off_col = 10,  // x pos of genome
+      spl_row = 30,  // y pos of splice junctions
+      ref_row = 46,  // y pos of genome
+      exn_row = 90,  // y pos of genome exons
+      tra_row = 200, // y pos of transcriptome
+      esp_row = 240, // y pos of transcriptome exons
+      ver_row = 300; // y pos of transcriptome exon verdicts
 
 const exon_height = 30,
       intron_height = 5;
@@ -304,19 +305,8 @@ function renderSequence(grp_name, trans_offsets, seq, title_text, update_x_alway
     return(grp)
 }
 
-function renderDonAcc(pos_donors_accpts){
+function renderDonAcc(don_acc){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
-
-    // Highlight Donors and Acceptors
-    // -- First build a named array
-    let don_acc = pos_donors_accpts.don.map(function(x,i){
-        return({val:x, name: "D"+i, fill: "red" });
-    });
-    let acc_arr = pos_donors_accpts.acc.map(function(x,i){
-        return({val:x, name: "A"+i, fill: "blue" });
-    });
-    don_acc.push.apply(don_acc, acc_arr);
-
     var dac_grp = primeGroup("dac", {x:off_col,y:ref_row})
 
     let dag = dac_grp.selectAll("text");
@@ -386,27 +376,76 @@ function renderIntrons(exons, grp_name, offset, update_always=false){
                .attr("x", d => ppml['12px'] * d.beg));
 }
 
+function renderVerdicts(verdicts){
+    t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
+    // Setup Reference
+    var grp = primeGroup("verdicts", {x:off_col, y:ver_row}, true);
+    let vtitle = grp.selectAll("text[class='verdict_title']"),
+        vtext = grp.selectAll("text[class='verdict_text']");
+
+    const font_fam = "sans",
+          font_size = "8px";
+    
+    vtitle = vtitle.data(verdicts, (d,i) => `${i}+${d.type}`)
+        .join(
+            enter => enter.append("text")
+                .style("font-family", font_fam)
+                .style("font-size", font_size)
+                .style("font-weight", "bold")
+                .attr("class", "verdict_title")
+                .text(d => d.type)
+                .attr("y", (d,i) => 12*i)
+                .attr("x", -20)
+                .attr("opacity", 0),
+            update => update.transition(t).text(d => d.type),
+            exit => exit.transition(t).remove().attr("x", -20)
+        ).call(vtitle => vtitle.transition(t).attr("opacity", 1).attr("x",0))
+
+    function updateText(d){
+        let via_text = (d.via === null)?"":` via ${d.vianame} (${d.via})`
+        return(`${d.desc} at ${d.where}${via_text}`)
+    }
+    
+    vtext = vtext.data(verdicts, (d,i) => `${i}+${d.type}`)
+        .join(
+            enter => enter.append("text")
+                .style("font-family", font_fam)
+                .style("font-size", font_size)
+                .style("font-weight", "light")
+                .attr("class", "verdict_text")
+                .text(updateText)
+                .attr("x", 15).attr("y", -100)
+                .attr("opacity", 0),
+            update => update.transition(t).text(updateText),
+            exit => exit.transition(t).remove().attr("y", -100).attr("opacity", 0)
+        ).call(vtext => vtext.transition(t).attr("opacity", 1).attr("y", (d,i) => 12*i))
+
+    return(grp)
+}
 
 function calculateLeftOffset(splice){
     var spliced_out = splice.map(x => x.size).reduce((x,y) => x + y)
     return(Math.floor(ppml['12px'] * spliced_out / 2) + off_col)
 }
 
-function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced_exons,
+function renderAll(seq, transcriptome, exons,
+                   splice_sites, splice_junctions,
+                   spliced_exons, verdicts,
                    ans)
 {
     var left_off = calculateLeftOffset(transcriptome.splice)
 
     const dontshow = ans !== rand.akey()
     if (dontshow){
-        splice = [{don:null, acc:null, name: null}]
+        splice_junctions = [{don:null, acc:null, name: null}]
         transcriptome.splice = [{pos:null, seq:null, size:null}]
+        verdicts = []
     }
     ansdiv.style.display = dontshow?"flex":"none";
 
     renderGenome(seq)
-    renderPairings(splice);
-    renderDonAcc(pos_donors_accpts);
+    renderPairings(splice_junctions);
+    renderDonAcc(splice_sites);
     renderGenomeExons(exons);
     renderGenomeIntrons(exons);
     if (transcriptome !== null){
@@ -414,5 +453,6 @@ function renderAll(seq, transcriptome, exons, pos_donors_accpts, splice, spliced
         renderSpliceJunctions(transcriptome.splice, left_off)
         renderSplicedExons(spliced_exons, left_off)
         renderSplicedIntrons(spliced_exons, left_off);
+        renderVerdicts(verdicts);
     }
 }

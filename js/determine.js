@@ -1,3 +1,12 @@
+const types_of_splicing = {
+    "CS" : "Constitutive Splicing",
+    "ES" : "Exon Skipping",
+    "AA" : "Alternative 3’ Acceptor Splice Site",
+    "AD" : "Alternative 5’ Donor Splice Site",
+    "IR" : "Intron Retention"
+}
+
+
 /** Determine transcripts from the splice pairings and exon  sequences **/
 function determineTranscriptome(genome, pairings){
     // First determine whether and where a splice site bisects an exon/intron
@@ -44,6 +53,7 @@ function determineSplicedExons(exons, splice){
     // For each exon (beg,end), check the splice site (acc, don) overlap
     var spliced_exons = [];
     var cumul_previous_shortening = 0;
+    var verdicts = [] ; // what type of splicing and where
 
     for (var e=0; e < exons.length; e++){
         var exon = exons[e],
@@ -56,11 +66,20 @@ function determineSplicedExons(exons, splice){
             exon_shortening = 0; // count the previous splice sites and subtract from exon
                                  // start to get the new position of the exon on the
                                  // transcript
-
         for (var s=0; s < splice.length; s++){
             var ssite = splice[s],
                 ss_beg = ssite.don, ss_end = ssite.acc;
 
+            if (e > 0){
+                if (((ss_end + 2) === ex_beg) && (ss_beg == exons[e-1].end)){
+                    verdicts.push({type: "CS", where: exon.name,
+                                   via: ssite.name, vianame: ssite.sites})
+                    exon_shortening += (ss_end + 2 - ss_beg)
+                    continue;
+                }
+            }
+
+            
             if (ss_beg > ex_end){
                 continue; // reject ss if out of bounds
             }
@@ -74,20 +93,28 @@ function determineSplicedExons(exons, splice){
             // 1) Splice completely overlaps exon (deletes exon)
             if ((ss_beg <= ex_beg) && (ss_end >= ex_end)){
                 positions_to_slice_out.push([ex_beg, ex_end])
+                verdicts.push({type:"ES", where: exon.name,
+                               via: ssite.name, vianame: ssite.sites})
                 break;
             }
             // 2) Splice is contained wholly within exon
             else if ((ss_beg > ex_beg) && (ss_end < ex_end)){
                 positions_to_slice_out.push([ss_beg, ss_end + 2]) // 2 for size of ss
+                verdicts.push({type:"IR", where: exon.name,
+                               via: ssite.name, vianame: ssite.sites})
             }
             // 3) Splice begin overlaps end of exon
-            else if ((ss_beg > ex_beg) && (ss_end > ex_end)){
+            else if ((ss_beg > ex_beg) && (ss_beg < ex_end) && (ss_end > ex_end)){
                 positions_to_slice_out.push([ss_beg, ex_end])
+                verdicts.push({type:"AD", where: exon.name,
+                               via: ssite.name, vianame: ssite.sites})
             }
             // 4) Splice end overlaps begin of exon
             else if ((ss_beg < ex_beg) && (ss_end > ex_beg)){
                 exon_shortening += (ex_beg - ss_beg)
                 positions_to_slice_out.push([ex_beg, ss_end + 2])
+                verdicts.push({type:"AA", where: exon.name,
+                               via: ssite.name, vianame: ssite.sites})
             }
         }
         // Sort the positions to slice out, and reverse
@@ -107,8 +134,26 @@ function determineSplicedExons(exons, splice){
             new_end = new_beg + new_len;
 
         // 100 step tone, duty yard
-        spliced_exons.push({beg: new_beg, end: new_end, len: new_len, name: exon.name, seq: working_exon})
+        spliced_exons.push({beg: new_beg, end: new_end,
+                            len: new_len, name: exon.name,
+                            seq: working_exon})
         //cumul_previous_shortening = exon.seq.length - working_exon.length;
     }
-    return(spliced_exons)
+    // Find intron retention
+    var nointrons = spliced_exons
+        .filter(x => x.len > 0).sort((x,r) => x.beg - r.beg) // remove zero-length exons from search
+        .map((x,i, arr) => {if (i > 0){return(arr[i].beg == arr[i-1].end)}; return(true)}) // search for connectivity
+    var introns_found = !(nointrons.reduce((x,y) => x && y))
+    if (introns_found){
+        for (let i=0; i < nointrons.length; i++){
+            if (nointrons[i] === false){
+                verdicts.push({type:"IR", where: exons[i].name,
+                               via: null, vianame: null})
+            }
+        }
+    }
+    // append description to verdicts
+    verdicts.forEach(x => x.desc = types_of_splicing[x.type])
+    
+    return({spliced_exons: spliced_exons, verdicts: verdicts})
 }
