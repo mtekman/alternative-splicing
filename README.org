@@ -1,0 +1,42 @@
+#+TITLE: Alternative Splicing
+#+AUTHOR: Mehmet Tekman
+
+This is a [[https://d3js.org/][D3]] SVG visualization of random alternative splice sites. The [[https://mtekman.gitlab.io/alternative-splicing/][live demo can be
+found here]], and the code repository is hosted at Gitlab. Pull requests should be made [[https://www.gitlab.com/mtekman/alternative-splicing][there]].
+
+** What is this?
+
+For a given =Reference Key= and =Splice Key=, a random genome is generated, along with
+exons, splice sites, the resulting transcriptome, and the resulting exon transcripts.
+
+#+CAPTION: Random Genome and Transcriptome
+#+NAME:   fig:random
+[[imgs/random.png]]
+
+** Types of Splicing Supported
+
+ The visualization supports the following types of splicing events:
+
+ - **CS**: Constitutive Splicing
+ - **ES**: Exon Skipping
+ - **AA**: Alternative 3’ Acceptor Splice Site
+ - **AD**: Alternative 5’ Donor Splice Site
+ - **IR**: Intron Retention
+
+** Exercise Mode
+
+If a custom =Reference Key= and =Splice Key= is given, then the chosen splice site
+junctions are hidden from the user, and can only be accessed via a unique =Answer Key=.
+
+#+CAPTION: Random Genome and Transcriptome
+#+NAME:   fig:custom
+[[imgs/custom.png]]
+
+Users can then try to guess what type of splicing occurred to generate the transcripts,
+and a teacher can check their answers using the =Answer Key=.
+
+Once the =Answer Key= is given, the splice sites are shown.
+
+
+
+
