@@ -167,7 +167,7 @@ svg text.pairings {
  vertical-align:middle
 }
 
-.box input[type="text"],input[type="number"] {
+.box input[type="text"],input[type="number"],input[type="button"] {
  text-align:center;
  width:90%;
  border-radius:10px;
@@ -175,7 +175,7 @@ svg text.pairings {
  display:grid;
 }
 @media (max-width:1000px){
- .box input[type="text"],input[type="number"] {
+ .box input[type="text"],input[type="number"],input[type="button"] {
    font-size: 2vmax;
  }
 }
@@ -184,7 +184,6 @@ svg text.pairings {
  margin: 3px;
  width: 90%;
  height: 90%;
- font-size: min(1em, 1.6vmin);
 }
 
 #signature {
