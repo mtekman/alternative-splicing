@@ -17,11 +17,11 @@ exons, splice sites, the resulting transcriptome, and the resulting exon transcr
 
  The visualization supports the following types of splicing events:
 
- - **CS**: Constitutive Splicing
- - **ES**: Exon Skipping
- - **AA**: Alternative 3’ Acceptor Splice Site
- - **AD**: Alternative 5’ Donor Splice Site
- - **IR**: Intron Retention
+ - *CS*: Constitutive Splicing
+ - *ES*: Exon Skipping
+ - *AA*: Alternative 3’ Acceptor Splice Site
+ - *AD*: Alternative 5’ Donor Splice Site
+ - *IR*: Intron Retention
 
 ** Exercise Mode
 
