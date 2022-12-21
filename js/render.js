@@ -324,7 +324,7 @@ function renderDonAcc(don_acc){
                 .attr("y", -50)
                 .attr("x", d => ppml['12px'] * d.val)
                 .attr("fill", d => d.fill),
-            update => update.transition(t).attr("x", d => ppml['12px'] * d.val),
+            update => update.transition(t).attr("x", d => ppml['12px'] * d.val).attr("opacity", "1"),
             exit => exit.transition(t).remove().attr("opacity", "0")
         ).call(dag => dag.transition(t).attr("y", -2));
 }
