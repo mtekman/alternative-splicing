@@ -3,8 +3,11 @@ var svg_group;
 var t; // transition elem
 
  // pixels per monospace letter
-const ppml = {'12px' : 7.21,
-              '8px' : 4.8}
+const ppml = {
+    '12px' : 7.21,
+    '8px' : 4.8
+}
+
 const off_col = 10,  // x pos of genome
       spl_row = 30,  // y pos of splice junctions
       ref_row = 46,  // y pos of genome
@@ -76,6 +79,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
                 .attr("y", 0)
                 .attr("class", "sequences")
                 .style("font-family", "monospace")
+                .style("font-size", "12px")
                 .attr("fill", "grey")
                 .text(d => d.seq),
             update => update.transition(t)
@@ -150,6 +154,7 @@ function renderPairings(pairings){
                 .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1.5))
                 .attr("y", -20)
                 .style("font-family", "monospace")
+                .style("font-size", "12px")
                 .attr("class", "pairings")
                 .text(""),
             update => update.transition(t)
@@ -314,6 +319,7 @@ function renderDonAcc(don_acc){
         .join(
             enter => enter.append("text")
                 .style("font-family", "monospace")
+                .style("font-size", "12px")
                 .text(d => d.name)
                 .attr("y", -50)
                 .attr("x", d => ppml['12px'] * d.val)
