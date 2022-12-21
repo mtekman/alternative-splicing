@@ -13,10 +13,10 @@ function generateCleanRef(wanted_len){
             new_letter = alpha[Math.floor(refrand()*4)];
             if (((last_letter === don[0]) && (new_letter === don[1])) ||
                 ((last_letter === acc[0]) && (new_letter === acc[1]))){
-                // keep searching!
-            } else {
-                break
-            }
+                    // keep searching!
+                } else {
+                    break
+                }
         }
         new_seq += new_letter;
         last_letter = new_letter;
@@ -70,7 +70,7 @@ function addSpliceSites(clean_ref, exons){
     insertSplice(don_normal, don)
 
     return ({new_ref: working_seq,
-             don_acc: {don:don_normal, acc:acc_normal}});
+        don_acc: {don:don_normal, acc:acc_normal}});
 }
 
 /** Generate a Genome reference of desired length and desired num splice sites **/
@@ -111,7 +111,7 @@ function generatePrecursorExons(clean_ref, spacing=4, min_s=4, max_s=30){
 }
 
 /** Generate ~N Exons within size limits from a clean reference, which will be used to
- * determine positions of normal splice sites **/
+   * determine positions of normal splice sites **/
 function generateExons(ref, exon_positions){
     exon_positions.map(x => x["seq"] = ref.substring(x.beg, x.end))
     exon_positions.map((x,i) => x["name"]="Ex" + (i+1));

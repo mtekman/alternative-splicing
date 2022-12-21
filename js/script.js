@@ -22,7 +22,7 @@ function initialiseInputs(){
     function clickUpdate(ev=null){
         updatebutton.click();
         setURLParams()
-        event.preventDefault();
+        ev.preventDefault();
     }
 
     var textfields = document.querySelectorAll("input[type='text']")
