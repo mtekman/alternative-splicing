@@ -141,13 +141,25 @@ function determineSplicedExons(exons, splice){
     }
     // Find intron retention
     var nointrons = spliced_exons
-        .filter(x => x.len > 0).sort((x,r) => x.beg - r.beg) // remove zero-length exons from search
-        .map((x,i, arr) => {if (i > 0){return(arr[i].beg == arr[i-1].end)}; return(true)}) // search for connectivity
-    var introns_found = !(nointrons.reduce((x,y) => x && y))
+         // remove zero-length exons from search
+        .filter(x => x.len > 0).sort((x,r) => x.beg - r.beg)
+        // search for exons with NO space in between
+        .map((x,i, arr) => {
+            if (i < arr.length - 1){
+                return({
+                    noint: arr[i].end == arr[i+1].beg,
+                    at: arr[i].name + "-" + arr[i+1].name
+                })
+            };
+            return({  // last exon
+                noint: true,
+                at: arr[i].name})
+        })
+    var introns_found = !(nointrons.every(x => x.noint == true))
     if (introns_found){
         for (let i=0; i < nointrons.length; i++){
-            if (nointrons[i] === false){
-                verdicts.push({type:"IR", where: exons[i].name,
+            if (nointrons[i].noint === false){
+                verdicts.push({type:"IR", where: nointrons[i].at,
                                via: null, vianame: null})
             }
         }
