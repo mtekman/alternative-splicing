@@ -117,6 +117,13 @@ function zoomtoggle(enable, parentNode){
 
 
 window.onload = function(){
+    if (window.document.documentMode){
+        alert("It looks like you're using Internet Explorer...\
+\n\nYou can proceed to use this website but please note that\
+\nNOTE: THINGS WILL NOT RENDER OR ALIGN PROPERLY.\
+\n\nPlease use Firefox or Chrome.")
+    }
+
     document.getElementById("version").innerHTML = "(v" + VERSION + ")"
 
     svg = d3.select("#svg-div").append("svg")
@@ -144,7 +151,7 @@ window.onload = function(){
     window.onresize = function(){
         newViewportSize(document.getElementById('genkey').valueAsNumber);
     }
-    
+
     // If no keys set, set them.
     if (document.getElementById("refkey").value === ""){
         rerender_random()
