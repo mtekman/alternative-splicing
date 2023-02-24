@@ -83,35 +83,7 @@ function rerender(){
     if (ref_val === "random"){
         splkey.value = spl_val = "random";
     }
-
-    splrand = rand.setseed(spl_val);
-    refrand = rand.setseed(ref_val);
-
-    var clean_ref = generateCleanRef(gen_len),
-        exon_pos = generatePrecursorExons(clean_ref),
-        genome_info = generateGenome(clean_ref, exon_pos),
-        genome = genome_info.new_ref,
-        splice_pos = genome_info.don_acc,
-        exons = generateExons(genome, exon_pos)
-    
-    var splice_sites = nameSites(splice_pos.don, splice_pos.acc)
-    var splice_junctions = makeValidSplicePairings(
-        prepareCartesian(splice_pos.don,splice_pos.acc),
-        splice_sites
-    );
-    
-    var transcriptome = null,
-        exons_spliced = null,
-        verdicts = null;
-    if (splice_junctions.length > 0){
-        transcriptome = determineTranscriptome(genome, splice_junctions);
-        splice_info = determineSplicedExons(exons, splice_junctions)
-        exons_spliced = splice_info.spliced_exons
-        verdicts = splice_info.verdicts
-    }
-    renderAll(genome, transcriptome, exons,
-              splice_sites, splice_junctions, exons_spliced, verdicts,
-              ans_key);
+    renderAll(calc_simulation(spl_val, ref_val, gen_len), ans_key);
 }
 
 function zoomtoggle(enable, parentNode){
