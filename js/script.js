@@ -1,4 +1,4 @@
-const VERSION=0.92;
+const VERSION=0.93;
 
 var svg_div;
 var splkey;
