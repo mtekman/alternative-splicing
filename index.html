@@ -28,7 +28,7 @@
             <div class="cornerspace upper" ></div>
           </li>
           <li class="toplevel">
-            <div class="container" >
+            <div class="container" id="studentmode" >
               <div class="box" >
                 <label for="genkey">Genome Size</label>
                 <input id="genkey" type="number" min="50" max="10000" step="10" value="100" />
@@ -49,6 +49,18 @@
               </div>
               <div class="box" >
                 <input type="button" id="updatebutton" value="Update" />
+              </div>
+            </div>
+            <!-- Click Mode -->
+            <div class="container" id="clickmode" >
+              <!-- The genome size should change randomnly, and
+                   users should have the option to skip -->
+              <div class="box" id="choose_options" >
+                <!-- A,B,C,D,E options -->
+              </div>
+              <div class="box" >
+                <input type="button" id="skipbutton" value="Skip?" />
+                <input type="button" id="checkbutton" value="Check" />
               </div>
             </div>
           </li>
