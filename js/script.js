@@ -1,10 +1,14 @@
 const VERSION=0.93;
 
 var svg_div;
+
 var splkey;
 var refkey;
 var anskey;
 var ansdiv;
+var genkey;
+
+var clickmode = false;
 
 /** Run once to initialise text boxes updating the SVG on keyup **/
 function initialiseInputs(){
@@ -17,6 +21,15 @@ function initialiseInputs(){
     var zoomkey = document.getElementById("zoomkey")
     zoomkey.onclick = function(){
         zoomtoggle(this.checked, this.parentNode);
+    }
+
+    clickmode = ((new URLSearchParams(window.location.search)).get("mode") === "click")
+    if (clickmode){
+        document.getElementById("studentmode").style.display = "none"
+        document.getElementById("clickmode").style.display = ""
+    } else {
+        document.getElementById("studentmode").style.display = ""
+        document.getElementById("clickmode").style.display = "none"
     }
 
     function clickUpdate(ev=null){
@@ -35,6 +48,8 @@ function initialiseInputs(){
         let gen_len = event.target.valueAsNumber;
         newViewportSize(gen_len);
         rerender(gen_len);
+        setURLParams()
+        
     });
     newViewportSize(numfield.valueAsNumber);
     rerender();
@@ -55,10 +70,16 @@ function rerender_random(){
 }
 
 /** Called by rerender_random before calling rerender **/
-function setURLParams(ref, spl){
+function setURLParams(ref, spl, gen, mod){
     var ref = ref || refkey.value,
-        spl = spl || splkey.value
-    window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}`)
+        spl = spl || splkey.value,
+        gen = gen || genkey.value,
+        mod = mod || ""
+    if (mod === ""){
+        window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}&gen=${gen}`)
+    } else {
+        window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}&gen=${gen}&mod=${mod}`)
+    }
 }
 
 /** Called on page load **/
@@ -66,6 +87,8 @@ function getURLParams(){
     var defs = new URLSearchParams(window.location.search)
     splkey.value = defs.get("spl")
     refkey.value = defs.get("ref")
+    genkey.value = defs.get("gen")
+    clickmode = defs.get("mod") === "click"
     if ((wordList.indexOf(splkey.value)=== -1) ||
         (wordList.indexOf(refkey.value)=== -1)){
         anskey.value = "None Given"
@@ -78,12 +101,12 @@ function rerender(){
     var spl_val = splkey.value,
         ref_val = refkey.value,
         ans_key = anskey.value,
-        gen_len = parseInt(document.getElementById("genkey").value)
+        gen_len = parseInt(genkey.value)
 
     if (ref_val === "random"){
         splkey.value = spl_val = "random";
     }
-    renderAll(calc_simulation(spl_val, ref_val, gen_len), ans_key);
+    renderAll(calc_simulation(spl_val, ref_val, gen_len), ans_key, clickmode);
 }
 
 function zoomtoggle(enable, parentNode){
@@ -135,6 +158,7 @@ window.onload = function(){
 
     splkey = document.getElementById("splkey")
     refkey = document.getElementById("refkey")
+    genkey = document.getElementById("genkey")
     anskey = document.getElementById("anskey")
     ansdiv = document.getElementById("answer")
 

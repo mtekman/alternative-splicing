@@ -72,8 +72,8 @@ console.log(\"REF SPL ANS GLEN VERDICT\")
 
 for (var n=0; n < names.length; n++){
     var nam = names[n];
-    var ref_key = nam[0];
-    var spl_key = nam[1]
+    var ref_key = nam[1];
+    var spl_key = nam[0]
     for (var g=0; g < genome_lengths.length; g++){
         var gen_len = genome_lengths[g]
         var verd = calc_simulation(spl_key, ref_key, gen_len).verdicts
