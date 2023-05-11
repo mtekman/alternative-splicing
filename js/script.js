@@ -9,50 +9,57 @@ var ansdiv;
 var genkey;
 
 var clickmode = false;
+var appraised_score = [0,1] ; // [right / total]
 
 /** Run once to initialise text boxes updating the SVG on keyup **/
 function initialiseInputs(){
-    var updatebutton = document.getElementById("updatebutton")
-    updatebutton.onclick = rerender;
 
-    var randombutton = document.getElementById("randombutton")
-    randombutton.onclick = rerender_random
+    if (clickmode){
+        var skipbutton = document.getElementById("skipbutton")
+        skipbutton.onclick = rerender_random;
 
+        var checkbutton = document.getElementById("checkbutton")
+        checkbutton.onclick = check_selection;
+        
+    } else {
+        var updatebutton = document.getElementById("updatebutton")
+        updatebutton.onclick = rerender;
+
+        var randombutton = document.getElementById("randombutton")
+        randombutton.onclick = rerender_random
+
+        function clickUpdate(ev=null){
+            updatebutton.click();
+            setURLParams()
+            ev.preventDefault();
+        }
+
+        var textfields = document.querySelectorAll("input[type='text']")
+        textfields.forEach(x => {
+            x.addEventListener("keyup", clickUpdate)
+        })
+
+        var numfield = document.querySelector("input[type='number']")
+        numfield.addEventListener("change", event => {
+            let gen_len = event.target.valueAsNumber;
+            newViewportSize(gen_len);
+            rerender(gen_len);
+            setURLParams()
+        });
+        newViewportSize(numfield.valueAsNumber);
+    }
     var zoomkey = document.getElementById("zoomkey")
     zoomkey.onclick = function(){
         zoomtoggle(this.checked, this.parentNode);
     }
 
-    clickmode = ((new URLSearchParams(window.location.search)).get("mode") === "click")
-    if (clickmode){
-        document.getElementById("studentmode").style.display = "none"
-        document.getElementById("clickmode").style.display = ""
-    } else {
-        document.getElementById("studentmode").style.display = ""
-        document.getElementById("clickmode").style.display = "none"
-    }
-
-    function clickUpdate(ev=null){
-        updatebutton.click();
-        setURLParams()
-        ev.preventDefault();
-    }
-
-    var textfields = document.querySelectorAll("input[type='text']")
-    textfields.forEach(x => {
-        x.addEventListener("keyup", clickUpdate)
-    })
-
-    var numfield = document.querySelector("input[type='number']")
-    numfield.addEventListener("change", event => {
-        let gen_len = event.target.valueAsNumber;
-        newViewportSize(gen_len);
-        rerender(gen_len);
-        setURLParams()
-        
-    });
-    newViewportSize(numfield.valueAsNumber);
     rerender();
+}
+
+function check_selection(){
+    // From the selected answer boxes, highlight which ones
+    // are green and which are red, and then encode the score in the url
+    
 }
 
 function rerender_random(){
@@ -64,7 +71,15 @@ function rerender_random(){
     } else {
         new_ref = refkey.value;
     }
-    setURLParams(new_ref, new_spl)
+    if (clickmode){
+        // Between 70 and 210 in increments of 10
+        //var new_gen = Math.floor(70 + (200 - 70)*Math.random() / 10) * 10
+        var new_gen = Math.round(60 + (300 - 70) * Math.random())
+        setURLParams(new_ref, new_spl, new_gen, "click")
+        newViewportSize(new_gen);
+    } else {
+        setURLParams(new_ref, new_spl)
+    }        
     getURLParams()
     rerender();
 }
@@ -163,6 +178,13 @@ window.onload = function(){
     ansdiv = document.getElementById("answer")
 
     getURLParams()
+    if (clickmode){
+        document.getElementById("studentmode").style.display = "none"
+        document.getElementById("clickmode").style.display = ""
+    } else {
+        document.getElementById("studentmode").style.display = ""
+        document.getElementById("clickmode").style.display = "none"
+    }
     initialiseInputs()
 
     // when history changes, update
