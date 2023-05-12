@@ -211,7 +211,7 @@ svg text.pairings {
 }
 
 .opts {
-  padding-top: 1em;
+  padding-top: 0.6em;
   display: flex;
   flex-flow: row wrap;
   justify-content: space-evenly;
@@ -247,14 +247,14 @@ svg text.pairings {
 
 .opts > div > div > div {
   margin: 1px;
-  padding-top: 10px;
+  padding-top: 0.6em;
   position: relative;
   border: 1px solid grey;
   border-radius: 6px;
   background: #dedede;
   min-width: 5em;
   width: 7em;
-  height: 0.8em;
+  height: 1em;
 }
 
 .opts > div > div > div:hover {
@@ -288,7 +288,7 @@ svg text.pairings {
   left: 1px;
   width: 15px;
   height: 10px;
-  font-size: 0.5em;
+  font-size: 0.6em;
   text-align: center;
   vertical-align: middle;
   font-weight: bold;
@@ -311,6 +311,6 @@ svg text.pairings {
   position: absolute;
   left: 20px;
   bottom: 0px;
-  font-size: 0.5em;
+  font-size: 0.7em;
 }
 
