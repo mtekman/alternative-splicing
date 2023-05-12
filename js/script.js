@@ -59,7 +59,19 @@ function initialiseInputs(){
 function check_selection(){
     // From the selected answer boxes, highlight which ones
     // are green and which are red, and then encode the score in the url
-
+    var inputs = document.getElementById("choose_options").getElementsByTagName("input")
+    for (var v=0; v < inputs.length; v++){
+        if (inputs[v].checked){
+            console.log(inputs[v])
+            inputs[v].parentNode.setAttribute("oldbg", inputs[v].parentNode.style.background)
+            inputs[v].parentNode.style.background = inputs[v].value==="real"?"green":"red"
+        } else {
+            var restore_col = inputs[v].parentNode.getAttribute("oldbg") || ""
+            if (restore_col != ""){
+                inputs[v].parentNode.style.background = restore_col
+            }
+        }
+    }
 }
 
 function rerender_random(){
@@ -179,9 +191,6 @@ function rerender(){
         var box_opts = document.getElementById("choose_options")
         box_opts.innerHTML = "";
 
-        var timeout_counter = 0,
-            timeout_diff = 150,
-            stack_after = 6;
         for (var v=0; v < verds.length; v++){
             let nod = verds[v]
             let div1 = document.createElement("div");
@@ -197,7 +206,7 @@ function rerender(){
             div1.innerHTML = str
             let cb = document.createElement("input")
             cb.type = "checkbox"
-            cb.value = "test"
+            cb.value = nod.real?"real":""
             //cb.style.display = "none"
             div1.appendChild(cb)
             div1.onclick = function(){
@@ -205,22 +214,10 @@ function rerender(){
             }
             div2.appendChild(div1)
             div3.appendChild(div2)
-            // if (--stack_after == 0){
-            //     timeout_counter += timeout_diff
-            //     stack_after = 6
-            // }
-            // setTimeout(function(){
             box_opts.appendChild(div3)
-            //}, timeout_counter)
         }
     }
     renderAll(sim, ans_key, clickmode);
-}
-
-function toggle_choice(div){
-    
-    div.checked = !div.checked || true
-    console.log(div)
 }
 
 function zoomtoggle(enable, parentNode){
