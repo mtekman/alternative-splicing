@@ -20,7 +20,7 @@ function initialiseInputs(){
 
         var checkbutton = document.getElementById("checkbutton")
         checkbutton.onclick = check_selection;
-        
+
     } else {
         var updatebutton = document.getElementById("updatebutton")
         updatebutton.onclick = rerender;
@@ -59,7 +59,7 @@ function initialiseInputs(){
 function check_selection(){
     // From the selected answer boxes, highlight which ones
     // are green and which are red, and then encode the score in the url
-    
+
 }
 
 function rerender_random(){
@@ -79,7 +79,7 @@ function rerender_random(){
         newViewportSize(new_gen);
     } else {
         setURLParams(new_ref, new_spl)
-    }        
+    }
     getURLParams()
     rerender();
 }
@@ -112,6 +112,58 @@ function getURLParams(){
     }
 }
 
+function clickmode_populate_verdicts(sim){
+    var verdicts = sim.verdicts
+    verdicts.map(x => {{x.real = true}}) // Mark the real verdicts
+
+    // Generate fake verdicts
+    var ex_names = sim.exons.map(x => x.name),
+        _sites = sim.splice_sites.map(x => x.name),
+        ss_accept = _sites.filter(x => x[0] === "A"),
+        ss_donor = _sites.filter(x => x[0] === "D"),
+        ss_types = Object.keys(types_of_splicing);
+
+    function pickOne(x){
+        return(x[Math.floor(Math.random()*x.length)])
+    }
+
+    function generateFakeVerdict(){
+        var s_accept = pickOne(ss_accept),
+            s_donor = pickOne(ss_donor),
+            s_type = pickOne(ss_types),
+            e_names = [pickOne(ex_names), pickOne(ex_names)];
+
+        var vd = {
+            type : s_type,
+            desc : types_of_splicing[s_type],
+            real : false // Mark the false verdicts
+        }
+        if (s_type == "IR"){
+            vd.where = e_names[0] + "-" + e_names[1]
+        } else {
+            vd.vianame = s_donor + "-" + s_accept
+            vd.where = e_names[0]
+        }
+        return(vd)
+    }
+
+    function verdictText(d){
+        let via_text = (d.via == undefined)?"":` via ${d.vianame} (${d.via})`
+        return(`${d.desc} at ${d.where}${via_text}`)
+    }
+
+    for (var v=verdicts.length; v < 10; v++){
+        verdicts.push(generateFakeVerdict())
+    }
+    // Perform shuffle
+    for (let i = verdicts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [verdicts[i], verdicts[j]] = [verdicts[j], verdicts[i]];
+    }
+    return(verdicts)
+}
+
+
 function rerender(){
     var spl_val = splkey.value,
         ref_val = refkey.value,
@@ -121,7 +173,54 @@ function rerender(){
     if (ref_val === "random"){
         splkey.value = spl_val = "random";
     }
-    renderAll(calc_simulation(spl_val, ref_val, gen_len), ans_key, clickmode);
+    var sim = calc_simulation(spl_val, ref_val, gen_len)
+    if (clickmode){
+        var verds = clickmode_populate_verdicts(sim)
+        var box_opts = document.getElementById("choose_options")
+        box_opts.innerHTML = "";
+
+        var timeout_counter = 0,
+            timeout_diff = 150,
+            stack_after = 6;
+        for (var v=0; v < verds.length; v++){
+            let nod = verds[v]
+            let div1 = document.createElement("div");
+            let div2 = document.createElement("div");
+            let div3 = document.createElement("div");
+
+            let str = ""
+            str += `<span class="corner">${nod.type}</span>`
+            str += `<span class="desc">${nod.desc}</span>`
+            str += `<span class="where">${nod.where}`
+            str += (nod.type === "IR")?"":` via ${nod.vianame}`
+            str += "</span>"
+            div1.innerHTML = str
+            let cb = document.createElement("input")
+            cb.type = "checkbox"
+            cb.value = "test"
+            //cb.style.display = "none"
+            div1.appendChild(cb)
+            div1.onclick = function(){
+                cb.checked = !cb.checked
+            }
+            div2.appendChild(div1)
+            div3.appendChild(div2)
+            // if (--stack_after == 0){
+            //     timeout_counter += timeout_diff
+            //     stack_after = 6
+            // }
+            // setTimeout(function(){
+            box_opts.appendChild(div3)
+            //}, timeout_counter)
+        }
+    }
+    renderAll(sim, ans_key, clickmode);
+}
+
+function toggle_choice(div){
+    
+    div.checked = !div.checked || true
+    console.log(div)
 }
 
 function zoomtoggle(enable, parentNode){

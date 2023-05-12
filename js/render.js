@@ -434,7 +434,7 @@ function calculateLeftOffset(splice){
     return(Math.floor(ppml['12px'] * spliced_out / 2) + off_col)
 }
 
-function renderAll(calc, ans){
+function renderAll(calc, ans, clickmode=false){
     var seq = calc.genome;
     var transcriptome = calc.transcriptome;
     var exons = calc.exons;
@@ -446,7 +446,7 @@ function renderAll(calc, ans){
     var left_off = calculateLeftOffset(transcriptome.splice)
 
     const dontshow = ans !== rand.akey()
-    if (dontshow){
+    if (dontshow || clickmode){
         splice_junctions = [{don:null, acc:null, name: null}]
         transcriptome.splice = [{pos:null, seq:null, size:null}]
         verdicts = []

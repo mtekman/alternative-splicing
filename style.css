@@ -209,3 +209,108 @@ svg text.pairings {
 #signature a:hover {
  color:white
 }
+
+.opts {
+  padding-top: 1em;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+  align-content: baseline;
+  row-gap: 1px; 
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.opts > div > div {
+  animation: 0.5s linear 0s 1 slideIn;
+}
+
+.opts > div:nth-child(1) > div  {animation-delay:  -25ms;}
+.opts > div:nth-child(2) > div  {animation-delay:  0ms;}
+.opts > div:nth-child(3) > div  {animation-delay:  25ms;}
+.opts > div:nth-child(4) > div  {animation-delay:  50ms;}
+.opts > div:nth-child(5) > div  {animation-delay:  75ms;}
+.opts > div:nth-child(6) > div  {animation-delay:  100ms;}
+.opts > div:nth-child(7) > div  {animation-delay:  125ms;}
+.opts > div:nth-child(8) > div  {animation-delay:  150ms;}
+.opts > div:nth-child(9) > div  {animation-delay:  175ms;}
+.opts > div:nth-child(10) > div {animation-delay:  200ms;}
+
+.opts > div > div > div {
+  margin: 1px;
+  padding-top: 10px;
+  position: relative;
+  border: 1px solid grey;
+  border-radius: 6px;
+  background: #dedede;
+  min-width: 5em;
+  width: 7em;
+  height: 0.8em;
+}
+
+.opts > div > div > div:hover {
+  animation-name: rotate;
+  animation-duration: 0.7s;
+  animation-delay: 0s;
+  background: white;
+  border: 1px solid black;
+}
+
+.opts > div > div > div > input[type=checkbox] {
+  position: absolute;
+  right:0px;
+  bottom: 0px;
+  opacity: 0;
+  width: 10px;
+}
+.opts > div > div > div > input[type=checkbox]:checked {
+  opacity: 1;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(-2deg); }
+  40% {transform: rotate(2deg);}
+}
+
+.opts > div > div > div > span.corner {
+  position: absolute;
+  padding: 1px;
+  top: 1px;
+  left: 1px;
+  width: 15px;
+  height: 10px;
+  font-size: 0.5em;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  background: white;
+  border-radius: 5px 3px 3px 3px; 
+}
+
+.opts > div > div > div > span.desc {
+  position: absolute;
+  top: 2px;
+  left: 20px;
+  max-height: 10px;
+  font-size: 0.5em;
+  text-align: left;
+  vertical-align: middle;
+  font-weight: bold;
+}
+
+.opts > div > div > div > span.where {
+  position: absolute;
+  left: 20px;
+  bottom: 0px;
+  font-size: 0.5em;
+}
+

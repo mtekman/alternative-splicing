@@ -1,8 +1,8 @@
 const types_of_splicing = {
     "CS" : "Constitutive Splicing",
     "ES" : "Exon Skipping",
-    "AA" : "Alternative 3’ Acceptor Splice Site",
-    "AD" : "Alternative 5’ Donor Splice Site",
+    "AA" : "Alternative 3’ Acceptor",
+    "AD" : "Alternative 5’ Donor",
     "IR" : "Intron Retention"
 }
 
