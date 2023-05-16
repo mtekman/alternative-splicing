@@ -100,7 +100,7 @@ function rerender_random(){
 function setURLParams(ref, spl, gen, mod){
     var ref = ref || refkey.value,
         spl = spl || splkey.value,
-        gen = gen || genkey.value,
+        gen = gen || genkey.value || 100,
         mod = mod || ""
     if (mod === ""){
         window.history.pushState("","", `index.html?ref=${ref}&spl=${spl}&gen=${gen}`)
@@ -274,6 +274,11 @@ window.onload = function(){
     ansdiv = document.getElementById("answer")
 
     getURLParams()
+    if (splkey.value === "" ||  refkey.value === "" | genkey.value === ""){
+        rerender_random()
+    }
+
+    
     if (clickmode){
         document.getElementById("studentmode").style.display = "none"
         document.getElementById("clickmode").style.display = ""
