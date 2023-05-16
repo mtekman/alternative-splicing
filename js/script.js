@@ -9,24 +9,22 @@ var ansdiv;
 var genkey;
 
 var clickmode = false;
+var click = {
+    check_count: 0,  // Active checked boxes
+    real_verdicts : 0 // Real verdicts out of all boxes
+}
+
 var appraised_score = [0,1] ; // [right / total]
 
 /** Run once to initialise text boxes updating the SVG on keyup **/
 function initialiseInputs(){
 
     if (clickmode){
-        var skipbutton = document.getElementById("skipbutton")
-        skipbutton.onclick = rerender_random;
-
-        var checkbutton = document.getElementById("checkbutton")
-        checkbutton.onclick = check_selection;
-
+        document.getElementById("skipbutton").onclick = rerender_random;
+        document.getElementById("checkbutton").onclick = check_verdict;
     } else {
-        var updatebutton = document.getElementById("updatebutton")
-        updatebutton.onclick = rerender;
-
-        var randombutton = document.getElementById("randombutton")
-        randombutton.onclick = rerender_random
+        document.getElementById("updatebutton").onclick = rerender
+        document.getElementById("randombutton").onclick = rerender_random
 
         function clickUpdate(ev=null){
             updatebutton.click();
@@ -34,8 +32,7 @@ function initialiseInputs(){
             ev.preventDefault();
         }
 
-        var textfields = document.querySelectorAll("input[type='text']")
-        textfields.forEach(x => {
+        document.querySelectorAll("input[type='text']").forEach(x => {
             x.addEventListener("keyup", clickUpdate)
         })
 
@@ -54,24 +51,6 @@ function initialiseInputs(){
     }
 
     rerender();
-}
-
-function check_selection(){
-    // From the selected answer boxes, highlight which ones
-    // are green and which are red, and then encode the score in the url
-    var inputs = document.getElementById("choose_options").getElementsByTagName("input")
-    for (var v=0; v < inputs.length; v++){
-        if (inputs[v].checked){
-            console.log(inputs[v])
-            inputs[v].parentNode.setAttribute("oldbg", inputs[v].parentNode.style.background)
-            inputs[v].parentNode.style.background = inputs[v].value==="real"?"green":"red"
-        } else {
-            var restore_col = inputs[v].parentNode.getAttribute("oldbg") || ""
-            if (restore_col != ""){
-                inputs[v].parentNode.style.background = restore_col
-            }
-        }
-    }
 }
 
 function rerender_random(){
@@ -127,6 +106,7 @@ function getURLParams(){
 function clickmode_populate_verdicts(sim){
     var verdicts = sim.verdicts
     verdicts.map(x => {{x.real = true}}) // Mark the real verdicts
+    click.real_verdicts = verdicts.length
 
     // Generate fake verdicts
     var ex_names = sim.exons.map(x => x.name),
@@ -194,6 +174,7 @@ function rerender(){
         for (var v=0; v < verds.length; v++){
             let nod = verds[v]
             let div1 = document.createElement("div");
+            div1.classList.add("clickbox")
             let div2 = document.createElement("div");
             let div3 = document.createElement("div");
 
@@ -211,13 +192,69 @@ function rerender(){
             div1.appendChild(cb)
             div1.onclick = function(){
                 cb.checked = !cb.checked
+                check_verdict()
             }
             div2.appendChild(div1)
             div3.appendChild(div2)
             box_opts.appendChild(div3)
         }
     }
+    check_verdict()
     renderAll(sim, ans_key, clickmode);
+}
+
+function check_verdict(showresult=false){
+    var cor_sel = document.getElementById("sel_cor");
+    var incor_sel = document.getElementById("sel_incor");
+    var inputs = document.getElementById("choose_options").getElementsByTagName("input");
+
+    var checked = 0,
+        trans_time = 800,
+        real = 0,
+        false_divs = []
+
+    for (var v=0; v < inputs.length; v++){
+        real += inputs[v].value==="real"?1:0
+        if (inputs[v].checked){
+            checked ++;
+
+            let iv = inputs[v]
+            let ivp = inputs[v].parentNode
+            if (showresult){
+                if (iv.value==="real"){
+                    ivp.style.borderColor = "blue"
+                    setTimeout(function(){
+                        cor_sel.appendChild(ivp)
+                        iv.remove()
+                    }, trans_time)
+                } else {
+                    ivp.style.borderColor = "red"
+                    
+                    setTimeout(function(){
+                        incor_sel.appendChild(ivp)
+                        iv.remove()
+                    }, trans_time)
+                    // remove the inputs here
+                    //console.log(inputs[v])
+                }
+            }
+        } else {
+            if (showresult){
+                inputs[v].parentNode.style.borderColor = "grey"
+            }
+        }
+    }
+    if (showresult){
+        setTimeout(function(){
+            check_verdict(false);
+        }, trans_time)
+    } else {
+        document.getElementById("verdict_counter").textContent = (checked === 0)?
+            `Please choose ${real} from below.`:`${checked} / ${real} selected`;
+    }
+    if (real === 0){
+        anskey.value = rand.akey(refkey.value, splkey.value)
+    }
 }
 
 function zoomtoggle(enable, parentNode){
