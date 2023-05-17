@@ -132,7 +132,7 @@ function determineSplicedExons(exons, splice){
         var new_beg = ex_beg - (exon_shortening),
             new_len = working_exon.length,
             new_end = new_beg + new_len;
-
+        
         // 100 step tone, duty yard
         spliced_exons.push({beg: new_beg, end: new_end,
                             len: new_len, name: exon.name,
@@ -140,15 +140,18 @@ function determineSplicedExons(exons, splice){
         //cumul_previous_shortening = exon.seq.length - working_exon.length;
     }
     // Find intron retention
+    // BUG: index.html?ref=lost&spl=block&gen=203 -- first IR block block wrong
     var nointrons = spliced_exons
          // remove zero-length exons from search
         .filter(x => x.len > 0).sort((x,r) => x.beg - r.beg)
         // search for exons with NO space in between
         .map((x,i, arr) => {
             if (i < arr.length - 1){
+                //if (parseInt(arr[i][2]) +   CHECK CONSECUTIVE
                 return({
                     noint: arr[i].end == arr[i+1].beg,
                     at: arr[i].name + "-" + arr[i+1].name
+                    //at: "before " + arr[i+1].name
                 })
             };
             return({  // last exon

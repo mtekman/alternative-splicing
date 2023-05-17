@@ -265,8 +265,18 @@ div.clickbox {
   user-select: none;
 }
 
+@keyframes rotate {
+  0% { transform: rotate(-2deg); }
+  40% {transform: rotate(2deg);}
+}
+
+@keyframes inflate {
+  0% { transform: translate3d(0)};
+  100% { transform: perspective(200px) translate3d(0px 0px 10px)};
+}
+
 div.clickbox:hover {
-  animation-name: rotate;
+  animation-name: inflate;
   animation-duration: 0.7s;
   animation-delay: 0s;
   background: white;
@@ -282,11 +292,6 @@ div.clickbox > input[type=checkbox] {
 }
 div.clickbox > input[type=checkbox]:checked {
   opacity: 1;
-}
-
-@keyframes rotate {
-  0% { transform: rotate(-2deg); }
-  40% {transform: rotate(2deg);}
 }
 
 div.clickbox > span.corner {

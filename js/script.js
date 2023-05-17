@@ -40,7 +40,7 @@ function initialiseInputs(){
         numfield.addEventListener("change", event => {
             let gen_len = event.target.valueAsNumber;
             newViewportSize(gen_len);
-            rerender(gen_len);
+            rerender();
             setURLParams()
         });
         newViewportSize(numfield.valueAsNumber);
@@ -50,7 +50,7 @@ function initialiseInputs(){
         zoomtoggle(this.checked, this.parentNode);
     }
 
-    rerender();
+    rerender(clickmode);
 }
 
 function rerender_random(){
@@ -72,7 +72,7 @@ function rerender_random(){
         setURLParams(new_ref, new_spl)
     }
     getURLParams()
-    rerender();
+    rerender(clickmode);
 }
 
 /** Called by rerender_random before calling rerender **/
@@ -156,7 +156,7 @@ function clickmode_populate_verdicts(sim){
 }
 
 
-function rerender(){
+function rerender(clickboxes){
     var spl_val = splkey.value,
         ref_val = refkey.value,
         ans_key = anskey.value,
@@ -166,41 +166,45 @@ function rerender(){
         splkey.value = spl_val = "random";
     }
     var sim = calc_simulation(spl_val, ref_val, gen_len)
-    if (clickmode){
-        var verds = clickmode_populate_verdicts(sim)
-        var box_opts = document.getElementById("choose_options")
-        box_opts.innerHTML = "";
+    if (clickboxes){
+        generate_click_boxes(sim)
+    }
+    renderAll(sim, ans_key, clickboxes);
+}
 
-        for (var v=0; v < verds.length; v++){
-            let nod = verds[v]
-            let div1 = document.createElement("div");
-            div1.classList.add("clickbox")
-            let div2 = document.createElement("div");
-            let div3 = document.createElement("div");
+function generate_click_boxes(sim){
+    var verds = clickmode_populate_verdicts(sim)
+    var box_opts = document.getElementById("choose_options")
+    box_opts.innerHTML = "";
 
-            let str = ""
-            str += `<span class="corner">${nod.type}</span>`
-            str += `<span class="desc">${nod.desc}</span>`
-            str += `<span class="where">${nod.where}`
-            str += (nod.type === "IR")?"":` via ${nod.vianame}`
-            str += "</span>"
-            div1.innerHTML = str
-            let cb = document.createElement("input")
-            cb.type = "checkbox"
-            cb.value = nod.real?"real":""
-            //cb.style.display = "none"
-            div1.appendChild(cb)
-            div1.onclick = function(){
-                cb.checked = !cb.checked
-                check_verdict()
-            }
-            div2.appendChild(div1)
-            div3.appendChild(div2)
-            box_opts.appendChild(div3)
+    for (var v=0; v < verds.length; v++){
+        let nod = verds[v]
+        let div1 = document.createElement("div");
+        div1.classList.add("clickbox")
+        let div2 = document.createElement("div");
+        let div3 = document.createElement("div");
+
+        let str = ""
+        str += `<span class="corner">${nod.type}</span>`
+        str += `<span class="desc">${nod.desc}</span>`
+        str += `<span class="where">${nod.where}`
+        str += (nod.type === "IR")?"":` via ${nod.vianame}`
+        str += "</span>"
+        div1.innerHTML = str
+        let cb = document.createElement("input")
+        cb.type = "checkbox"
+        cb.value = nod.real?"real":""
+        //cb.style.display = "none"
+        div1.appendChild(cb)
+        div1.onclick = function(){
+            cb.checked = !cb.checked
+            check_verdict()
         }
+        div2.appendChild(div1)
+        div3.appendChild(div2)
+        box_opts.appendChild(div3)
     }
     check_verdict()
-    renderAll(sim, ans_key, clickmode);
 }
 
 function check_verdict(showresult=false){
@@ -260,6 +264,7 @@ function check_verdict(showresult=false){
     }
     if (real === 0){
         anskey.value = rand.akey(refkey.value, splkey.value)
+        rerender(false)
     }
 }
 
@@ -335,7 +340,7 @@ window.onload = function(){
     window.onpopstate = function(){
         getURLParams();
         //setURLParams();
-        rerender();
+        rerender(clickmode);
     }
 
     window.onresize = function(){
