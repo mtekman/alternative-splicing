@@ -29,7 +29,7 @@ function initialiseInputs(){
         function clickUpdate(ev=null){
             updatebutton.click();
             setURLParams()
-            ev.preventDefault();
+            ev.preventDefault(); // cancels the click event
         }
 
         document.querySelectorAll("input[type='text']").forEach(x => {
@@ -209,9 +209,8 @@ function check_verdict(showresult=false){
     var inputs = document.getElementById("choose_options").getElementsByTagName("input");
 
     var checked = 0,
-        trans_time = 800,
-        real = 0,
-        false_divs = []
+        trans_time = 500, // must match .transition-out animation time
+        real = 0;
 
     for (var v=0; v < inputs.length; v++){
         real += inputs[v].value==="real"?1:0
@@ -223,15 +222,18 @@ function check_verdict(showresult=false){
             if (showresult){
                 if (iv.value==="real"){
                     ivp.style.borderColor = "blue"
+                    ivp.classList.add("transition-out-correct")
                     setTimeout(function(){
                         cor_sel.appendChild(ivp)
+                        ivp.classList.remove("transition-out-correct")
                         iv.remove()
                     }, trans_time)
                 } else {
                     ivp.style.borderColor = "red"
-                    
+                    ivp.classList.add("transition-out-incorrect")
                     setTimeout(function(){
                         incor_sel.appendChild(ivp)
+                        ivp.classList.remove("transition-out-incorrect")
                         iv.remove()
                     }, trans_time)
                     // remove the inputs here
@@ -249,8 +251,12 @@ function check_verdict(showresult=false){
             check_verdict(false);
         }, trans_time)
     } else {
-        document.getElementById("verdict_counter").textContent = (checked === 0)?
-            `Please choose ${real} from below.`:`${checked} / ${real} selected`;
+        if (real > 0){
+            document.getElementById("verdict_counter").textContent = (checked === 0)?
+                `Please choose ${real} from below.`:`${checked} / ${real} selected`;
+        } else {
+            // TODO
+        }
     }
     if (real === 0){
         anskey.value = rand.akey(refkey.value, splkey.value)

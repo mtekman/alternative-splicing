@@ -217,21 +217,28 @@ svg text.pairings {
   justify-content: space-evenly;
   align-content: baseline;
   row-gap: 1px; 
+  flex-basis: auto;
 }
 
 @keyframes slideIn {
   0% {
-    transform: translateY(-100%);
+    transform: perspective(10px) translate3d(-0px, -200px, -10px);
     opacity: 0
   }
   100% {
-    transform: translateY(0);
+    transform: translate3d(0);
     opacity: 1;
   }
 }
 
+.opts > div {
+  /*! flex-grow: 1; */
+  flex-shrink: 1;
+  transition: all 1s;
+}
+
 .opts > div > div {
-  animation: 0.5s linear 0s 1 slideIn;
+  animation: 0.5s ease-out 0s 1 slideIn;
 }
 
 .opts > div:nth-child(1) > div  {animation-delay:  -25ms;}
@@ -255,7 +262,7 @@ div.clickbox {
   min-width: 5em;
   width: 7em;
   height: 1em;
-  transition: all 0.3s ease;
+  user-select: none;
 }
 
 div.clickbox:hover {
@@ -337,12 +344,51 @@ div.clickbox > span.where {
   max-width: 15em;
 }
 
+@keyframes removeToLeft {
+  from { 
+    transform: translate3d(0);
+  }
+  to {
+    transform: perspective(10px) translate3d(-800px, 0px, -50px);
+    opacity: 0;
+  }
+}
+
+@keyframes removeToRight {
+  from {
+    transform: translate3d(0);
+  }
+  to {
+    transform: perspective(10px) translate3d(800px, 0px, -50px);
+    opacity: 0;
+  }
+}
+
+
+.transition-out-correct {
+   animation: 0.5s ease-in 0s 1 removeToLeft;
+}
+.transition-out-incorrect {
+   animation: 0.5s ease-in 0s 1 removeToRight;
+}
+
+
+@keyframes toSide {
+  0 {
+    transform: translateY(200%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
 .selected div.clickbox {
   padding-top: unset;
   width: unset;
   opacity: 0.4;
-  transition: all 0.3s ease;
   min-width: 6em;
+  animation: 4s ease-in 0s 1 toSide;
 }
 
 .selected div.clickbox .desc {
