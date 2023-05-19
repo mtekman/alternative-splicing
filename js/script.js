@@ -206,7 +206,7 @@ function generate_click_boxes(sim){
         cb.type = "checkbox"
         cb.value = nod.real?"real":""
         //cb.style.display = "none"
-        div1.appendChild(cb)
+        div1.prepend(cb)
         div1.onclick = function(){
             cb.checked = !cb.checked
             check_verdict()
@@ -270,13 +270,26 @@ function check_verdict(showresult=false){
             document.getElementById("verdict_counter").textContent = (checked === 0)?
                 `Please choose ${real} from below.`:`${checked} / ${real} selected`;
         } else {
-            // TODO
+            anskey.value = rand.akey(refkey.value, splkey.value)
+            rerender(false)
+            tally_score()
+            //rerender_random()
         }
     }
-    if (real === 0){
-        anskey.value = rand.akey(refkey.value, splkey.value)
-        rerender(false)
-    }
+}
+
+function tally_score(){
+    var right_div = document.getElementById("sel_cor"),
+        right = right_div.childNodes.length
+    var wrong_div = document.getElementById("sel_incor"),
+        wrong= wrong_div.childNodes.length;
+    //
+    var total = right + wrong;
+    // delete children
+    while (right_div.firstChild){right_div.removeChild(right_div.lastChild)};
+    while (wrong_div.firstChild){wrong_div.removeChild(wrong_div.lastChild)};
+    // score -- 
+    document.getElementById("verdict_counter").textContent = `${right} right and ${wrong} wrong`
 }
 
 function zoomtoggle(enable, parentNode){
@@ -337,7 +350,7 @@ window.onload = function(){
         rerender_random()
     }
 
-    
+
     if (clickmode){
         document.getElementById("studentmode").style.display = "none"
         document.getElementById("clickmode").style.display = ""

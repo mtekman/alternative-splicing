@@ -298,14 +298,20 @@ div.clickbox:hover >  span.desc {
 
 
 div.clickbox > input[type=checkbox] {
-  position: absolute;
+  /*position: absolute;
   right:0px;
   bottom: 0px;
   opacity: 0;
-  width: 10px;
+  width: 10px;*/
+  display: none;
 }
 div.clickbox > input[type=checkbox]:checked {
   opacity: 1;
+}
+div.clickbox > input[type=checkbox]:checked ~ span.corner {
+  background: blue;
+  color: white;
+  box-shadow: 1px 1px grey;
 }
 
 div.clickbox > span.corner {
@@ -446,6 +452,18 @@ div.clickbox > span.where {
   padding-left: 20px;
   display: unset;
   flex-direction: unset;
+}
+
+#sel_incor div {
+  font-size: 0.7em;
+}
+#sel_incor div span {
+  background: unset;
+}
+
+
+#sel_cor div {
+  font-size: 1.1em;
 }
 
 
