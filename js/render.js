@@ -42,7 +42,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
     var exn_grp = primeGroup(grpname, offsets, update_always)
 
     let blocks = exn_grp.selectAll("rect"),
-        sequences = exn_grp.selectAll("text[class='sequences']"),
+        sequences = exn_grp.selectAll("text[class='exon_sequences']"),
         labels = exn_grp.selectAll("text[class='labels']");
 
     // Exons with a non-zero sequence length. We still feed the blocks the original data
@@ -77,9 +77,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
             enter => enter.append("text") // sequence
                 .attr("x", d => ppml['12px'] * d.beg)
                 .attr("y", 0)
-                .attr("class", "sequences")
-                .style("font-family", "monospace")
-                .style("font-size", "12px")
+                .attr("class", "exon_sequences")
                 .attr("fill", "grey")
                 .text(d => d.seq),
             update => update.transition(t)
@@ -262,7 +260,7 @@ function renderSequence(grp_name, trans_offsets, seq, title_text, update_x_alway
     var grp = primeGroup(grp_name, trans_offsets, update_x_always);
 
     let border = grp.selectAll("rect"),
-        seqs = grp.selectAll("text[class='sequence']"),
+        seqs = grp.selectAll("text[class='reference_sequences']"),
         title = grp.selectAll("text[class='title']")
 
     border = border.data([{0:seq}], (d,i) => i) // should never change
@@ -282,10 +280,8 @@ function renderSequence(grp_name, trans_offsets, seq, title_text, update_x_alway
     seqs = seqs.data([{seq:seq}], d => d.seq)
         .join(
             enter => enter.append("text")
-                .style("font-family", "monospace")
-                .style("font-size", "12px")
                 .text(d => d.seq)
-                .attr("class", "sequence")
+                .attr("class", "reference_sequences")
                 .attr("x", 0)
                 .attr("y", 11)
                 .attr("opacity", 0),
@@ -296,8 +292,6 @@ function renderSequence(grp_name, trans_offsets, seq, title_text, update_x_alway
     title = title.data([{0:title_text}], (d,i) => i) // Should also never change
         .join(
             enter => enter.append("text")
-                .style("font-family", "sans")
-                .style("font-size", "8px")
                 .attr("class", "title")
                 .text(title_text)
                 .attr("y", 20)
@@ -389,15 +383,9 @@ function renderVerdicts(verdicts){
     let vtitle = grp.selectAll("text[class='verdict_title']"),
         vtext = grp.selectAll("text[class='verdict_text']");
 
-    const font_fam = "sans",
-          font_size = "8px";
-    
     vtitle = vtitle.data(verdicts, (d,i) => `${i}+${d.type}`)
         .join(
             enter => enter.append("text")
-                .style("font-family", font_fam)
-                .style("font-size", font_size)
-                .style("font-weight", "bold")
                 .attr("class", "verdict_title")
                 .text(d => d.type)
                 .attr("y", (d,i) => 12*i)
@@ -415,9 +403,6 @@ function renderVerdicts(verdicts){
     vtext = vtext.data(verdicts, (d,i) => `${i}+${d.type}`)
         .join(
             enter => enter.append("text")
-                .style("font-family", font_fam)
-                .style("font-size", font_size)
-                .style("font-weight", "light")
                 .attr("class", "verdict_text")
                 .text(updateText)
                 .attr("x", 15).attr("y", -100)

@@ -147,12 +147,20 @@ function determineSplicedExons(exons, splice){
         // search for exons with NO space in between
         .map((x,i, arr) => {
             if (i < arr.length - 1){
-                //if (parseInt(arr[i][2]) +   CHECK CONSECUTIVE
-                return({
-                    noint: arr[i].end == arr[i+1].beg,
-                    at: arr[i].name + "-" + arr[i+1].name
-                    //at: "before " + arr[i+1].name
-                })
+                if (parseInt(arr[i+1].name[2]) - parseInt(arr[i].name[2]) === 1){
+                    // Entire Intron
+                    return({
+                        noint: arr[i].end == arr[i+1].beg,
+                        at: arr[i].name + "-" + arr[i+1].name
+                    })
+                }
+                else {
+                    // Partial intron
+                    return({
+                        noint: arr[i].end == arr[i+1].beg,
+                        at: "just before " + arr[i+1].name
+                    })
+                }
             };
             return({  // last exon
                 noint: true,

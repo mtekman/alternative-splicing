@@ -53,6 +53,15 @@ function initialiseInputs(){
     rerender(clickmode);
 }
 
+function sensible_genlen(){
+    // Determine a sensible genome length for the current window size.
+    var rec_len = (window.innerWidth / 10) * 1.25
+    var ran_len = Math.floor(rec_len + (Math.random()*10) - 5)
+    //var new_gen = Math.floor(70 + (200 - 70)*Math.random() / 10) * 10
+    //var new_gen = Math.round(60 + (300 - 70) * Math.random())
+    return(ran_len)
+}
+
 function rerender_random(){
     var [new_ref, new_spl] = words(2)
     var both = document.getElementById("bothkeys").checked
@@ -63,9 +72,7 @@ function rerender_random(){
         new_ref = refkey.value;
     }
     if (clickmode){
-        // Between 70 and 210 in increments of 10
-        //var new_gen = Math.floor(70 + (200 - 70)*Math.random() / 10) * 10
-        var new_gen = Math.round(60 + (300 - 70) * Math.random())
+        var new_gen = sensible_genlen()
         setURLParams(new_ref, new_spl, new_gen, "click")
         newViewportSize(new_gen);
     } else {
@@ -156,20 +163,24 @@ function clickmode_populate_verdicts(sim){
 }
 
 
-function rerender(clickboxes){
+function rerender(show_clickboxes=false){
     var spl_val = splkey.value,
         ref_val = refkey.value,
         ans_key = anskey.value,
         gen_len = parseInt(genkey.value)
 
+    if (typeof show_clickboxes !== "boolean"){
+        show_clickboxes = false;
+    }
+
     if (ref_val === "random"){
         splkey.value = spl_val = "random";
     }
     var sim = calc_simulation(spl_val, ref_val, gen_len)
-    if (clickboxes){
+    if (show_clickboxes){
         generate_click_boxes(sim)
     }
-    renderAll(sim, ans_key, clickboxes);
+    renderAll(sim, ans_key, show_clickboxes);
 }
 
 function generate_click_boxes(sim){

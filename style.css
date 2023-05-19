@@ -210,6 +210,10 @@ svg text.pairings {
  color:white
 }
 
+#skipbutton {
+  background: #adc4ac;
+}
+
 .opts {
   padding-top: 0.6em;
   display: flex;
@@ -258,11 +262,12 @@ div.clickbox {
   position: relative;
   border: 1px solid grey;
   border-radius: 6px;
-  background: #dedede;
+  background: #ffea7a;
   min-width: 5em;
   width: 7em;
   height: 1em;
   user-select: none;
+  box-shadow: 1px 1px 1px grey;
 }
 
 @keyframes rotate {
@@ -271,17 +276,26 @@ div.clickbox {
 }
 
 @keyframes inflate {
-  0% { transform: translate3d(0)};
-  100% { transform: perspective(200px) translate3d(0px 0px 10px)};
+  0% {
+    transform: translate3d(0);
+  }
+  100% {
+    transform: perspective(16px) translate3d(0px, 0px, 1px);
+    z-index: 99;
+  }
 }
 
 div.clickbox:hover {
-  animation-name: inflate;
-  animation-duration: 0.7s;
-  animation-delay: 0s;
+  /*animation: inflate 0.2s ease-out forwards;*/
   background: white;
   border: 1px solid black;
+  box-shadow: 1px 1px 1px black;
 }
+
+div.clickbox:hover >  span.desc {
+  color: blue;
+}
+
 
 div.clickbox > input[type=checkbox] {
   position: absolute;
@@ -341,6 +355,33 @@ div.clickbox > span.where {
   top: 0.2em;
 }
 
+.title {
+  font-family: sans;
+  font-size: 8px;
+}
+
+.exon_sequences {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.reference_sequences {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+
+.verdict_text {
+  font-family: sans;
+  font-size: 8px;
+  font-weight: light;
+}
+.verdict_title {
+  font-family: sans;
+  font-size: 8px;
+  font-weight: bold;
+}
+
 .selected {
   display: flex;
   flex-wrap: wrap;
@@ -394,6 +435,7 @@ div.clickbox > span.where {
   opacity: 0.4;
   min-width: 6em;
   animation: 4s ease-in 0s 1 toSide;
+  background: unset;
 }
 
 .selected div.clickbox .desc {
