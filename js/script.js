@@ -11,7 +11,9 @@ var genkey;
 var clickmode = false;
 var click = {
     check_count: 0,  // Active checked boxes
-    real_verdicts : 0 // Real verdicts out of all boxes
+    real_verdicts : 0, // Real verdicts out of all boxes
+    verdicts_correct: [],  // array of correctly selected verdicts
+    transition: 0
 }
 
 var appraised_score = [0,1] ; // [right / total]
@@ -55,31 +57,11 @@ function initialiseInputs(){
 
 function sensible_genlen(){
     // Determine a sensible genome length for the current window size.
-    var rec_len = (window.innerWidth / 10) * 1.25
+    var rec_len = (window.innerWidth / 10) * 1.2
     var ran_len = Math.floor(rec_len + (Math.random()*10) - 5)
     //var new_gen = Math.floor(70 + (200 - 70)*Math.random() / 10) * 10
     //var new_gen = Math.round(60 + (300 - 70) * Math.random())
     return(ran_len)
-}
-
-function rerender_random(){
-    var [new_ref, new_spl] = words(2)
-    var both = document.getElementById("bothkeys").checked
-    splkey.value = new_spl;
-    if (both){
-        refkey.value = new_ref;
-    } else {
-        new_ref = refkey.value;
-    }
-    if (clickmode){
-        var new_gen = sensible_genlen()
-        setURLParams(new_ref, new_spl, new_gen, "click")
-        newViewportSize(new_gen);
-    } else {
-        setURLParams(new_ref, new_spl)
-    }
-    getURLParams()
-    rerender(clickmode);
 }
 
 /** Called by rerender_random before calling rerender **/
@@ -141,14 +123,11 @@ function clickmode_populate_verdicts(sim){
             vd.where = e_names[0] + "-" + e_names[1]
         } else {
             vd.vianame = s_donor + "-" + s_accept
+            vd.via = sim.splice_sites.filter(x => x.name === s_donor)[0].val + "-" +
+                (sim.splice_sites.filter(x => x.name === s_accept)[0].val + 2) // we add 2 to keep in line with real
             vd.where = e_names[0]
         }
         return(vd)
-    }
-
-    function verdictText(d){
-        let via_text = (d.via == undefined)?"":` via ${d.vianame} (${d.via})`
-        return(`${d.desc} at ${d.where}${via_text}`)
     }
 
     for (var v=verdicts.length; v < 10; v++){
@@ -162,6 +141,24 @@ function clickmode_populate_verdicts(sim){
     return(verdicts)
 }
 
+function rerender_random(){
+    var [new_ref, new_spl] = words(2)
+    var both = document.getElementById("bothkeys").checked
+    splkey.value = new_spl;
+    if (both){
+        refkey.value = new_ref;
+    } else {
+        new_ref = refkey.value;
+    }
+    if (clickmode){
+        var new_gen = sensible_genlen()
+        setURLParams(new_ref, new_spl, new_gen, "click")
+    } else {
+        setURLParams(new_ref, new_spl)
+    }
+    getURLParams()
+    rerender(clickmode);
+}
 
 function rerender(show_clickboxes=false){
     var spl_val = splkey.value,
@@ -169,6 +166,7 @@ function rerender(show_clickboxes=false){
         ans_key = anskey.value,
         gen_len = parseInt(genkey.value)
 
+    newViewportSize(gen_len);
     if (typeof show_clickboxes !== "boolean"){
         show_clickboxes = false;
     }
@@ -201,6 +199,7 @@ function generate_click_boxes(sim){
         str += `<span class="where">${nod.where}`
         str += (nod.type === "IR")?"":` via ${nod.vianame}`
         str += "</span>"
+        str += `<span class="viahidden">${nod.via}</span>`
         div1.innerHTML = str
         let cb = document.createElement("input")
         cb.type = "checkbox"
@@ -211,6 +210,28 @@ function generate_click_boxes(sim){
             cb.checked = !cb.checked
             check_verdict()
         }
+        div1.onmouseenter = function(){
+            if (nod.via){
+                var tmp = nod.via.split("-").map(x => parseInt(x))
+                var curr_correct = click.verdicts_correct.slice()
+                var res = {don: tmp[0], acc: tmp[1]-2, name: nod.type}
+                curr_correct.push(res)
+                console.log(curr_correct)
+                renderPairings(curr_correct, duration=600)
+                click.transition++;
+            }
+        }
+        div1.onmouseleave = function(){
+            if (click.transition > 0){
+                click.transition--;
+                setTimeout(function(){
+                    if (click.transition <= 0){
+                        renderPairings([], duration=350)
+                    }
+                }, 300)
+            }
+        }
+        
         div2.appendChild(div1)
         div3.appendChild(div2)
         box_opts.appendChild(div3)
@@ -238,6 +259,9 @@ function check_verdict(showresult=false){
                 if (iv.value==="real"){
                     ivp.style.borderColor = "blue"
                     ivp.classList.add("transition-out-correct")
+                    let viapos = ivp.getElementsByClassName("viahidden")[0]
+                        .innerText.split("-").map(x => parseInt(x))
+                    click.verdicts_correct.push({don:viapos[0], acc:viapos[1], name: "correct"})
                     setTimeout(function(){
                         cor_sel.appendChild(ivp)
                         ivp.classList.remove("transition-out-correct")

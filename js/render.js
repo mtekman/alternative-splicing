@@ -4,7 +4,7 @@ var t; // transition elem
 
  // pixels per monospace letter
 const ppml = {
-    '12px' : 7.21,
+    '12px' : 7.22, //7.21,
     '8px' : 4.8
 }
 
@@ -86,7 +86,7 @@ function renderExons(exons, grpname, offsets, update_always=false){
             exit => exit.remove()
         ).call(sequences => sequences.transition(t)
                .attr("y", 0));
-
+   
     labels = labels.data(filter_exons, d => d.name)
         .join(
             enter => enter.append("text") // label, rotated 90
@@ -105,9 +105,8 @@ function renderExons(exons, grpname, offsets, update_always=false){
 
 
 
-function renderPairings(pairings){
-    t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
-
+function renderPairings(pairings, duration=1000){
+    t = svg.transition().duration(duration).delay(-300).ease(d3.easeCubic);
     // Setup Splice Pairings
     var spl_grp = primeGroup("splices", {x:off_col,y:spl_row})
 
@@ -117,10 +116,11 @@ function renderPairings(pairings){
     const y_l1 = 4, y_l2 = -1, y_l3 = y_l2, y_l4 = -4;
 
     function makeC(d,i){
-        let x_left = ppml['12px'] * (d.don + 0.3),
-            x_right = ppml['12px'] * (d.acc + 1.7),
-            x_mid = ppml['12px'] * (1 + d.don + ((d.acc - d.don)/2))
+        let x_left = ppml['12px'] * (d.don + 1),
+            x_right = ppml['12px'] * (d.acc + 1),
+            x_mid = x_left + ((x_right - x_left) / 2)
 
+        
         let point_arr =
             [`${x_left},${y_l1}`, `${x_left},${y_l2}`,
              `${x_mid - 2},${y_l3}`,
@@ -146,21 +146,30 @@ function renderPairings(pairings){
             exit => exit.transition(t).remove().attr("transform", "translate(0,-40)")
         ).call(blocks => blocks.transition(t));
 
+
+    function center_text(d){
+        var cent = ppml['12px'] * (d.don + 1 + ((d.acc - d.don)/2) - 2)
+        var namlen = d.name.length
+        if (namlen%2==1){namlen = namlen - 1}
+        var text_off = (namlen/2 * ppml['12px'])
+        return (cent + text_off)
+    }
+    
     texts = texts.data(pairings, (d,i) => i)
         .join(
             enter => enter.append("text")
-                .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1.5))
+                .attr("x", d => center_text(d))
                 .attr("y", -20)
                 .style("font-family", "monospace")
                 .style("font-size", "12px")
                 .attr("class", "pairings")
                 .text(""),
             update => update.transition(t)
-                .attr("x", d => ppml['12px'] * (d.don + ((d.acc - d.don)/2) - 1.5))
+                .attr("x", d => center_text(d))
                 .text(d => d.name),
             exit => exit.transition(t).remove().attr("opacity", "0")
         ).call(texts => texts.transition(t)
-               .attr("y", -y_l1)
+            .attr("y", -(y_l1 + 5))
                .text(d => d.name));
 }
 
@@ -380,7 +389,7 @@ function renderVerdicts(verdicts){
     t = svg.transition().duration(1000).delay(-300).ease(d3.easeCubic);
     // Setup Reference
     var grp = primeGroup("verdicts", {x:off_col, y:ver_row}, true);
-    let vtitle = grp.selectAll("text[class='verdict_title']"),
+    let vtitle = grp.selectAll("text[class='verdict_ title']"),
         vtext = grp.selectAll("text[class='verdict_text']");
 
     vtitle = vtitle.data(verdicts, (d,i) => `${i}+${d.type}`)

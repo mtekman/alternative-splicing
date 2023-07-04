@@ -66,11 +66,14 @@ function addSpliceSites(clean_ref, exons){
             working_seq = left + site_ss + right;
         }
     }
+
     insertSplice(acc_normal, acc)
     insertSplice(don_normal, don)
 
-    return ({new_ref: working_seq,
-        don_acc: {don:don_normal, acc:acc_normal}});
+    return ({
+        new_ref: working_seq,
+        don_acc: {don:don_normal, acc:acc_normal}
+    });
 }
 
 /** Generate a Genome reference of desired length and desired num splice sites **/
